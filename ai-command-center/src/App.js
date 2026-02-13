@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const DEPLOYMENTS = [
@@ -8,13 +8,13 @@ const DEPLOYMENTS = [
 ];
 
 const DOCK_ITEMS = [
-  { id: 'deploy', label: 'Deploy', icon: RocketIcon },
-  { id: 'domains', label: 'Domains', icon: GlobeIcon },
-  { id: 'ssl', label: 'SSL', icon: LockIcon },
-  { id: 'monitor', label: 'Monitor', icon: MonitorIcon },
-  { id: 'fix', label: 'Fix', icon: WrenchIcon },
-  { id: 'automate', label: 'Automate', icon: AutomateIcon },
-  { id: 'settings', label: 'Settings', icon: SettingsIcon },
+  { id: 'deploy', label: 'Deploy', icon: RocketIcon, color: '#22c55e' },
+  { id: 'domains', label: 'Domains', icon: GlobeIcon, color: '#3b82f6' },
+  { id: 'ssl', label: 'SSL', icon: LockIcon, color: '#eab308' },
+  { id: 'monitor', label: 'Monitor', icon: MonitorIcon, color: '#a855f7' },
+  { id: 'fix', label: 'Fix', icon: WrenchIcon, color: '#f97316' },
+  { id: 'automate', label: 'Automate', icon: AutomateIcon, color: '#ec4899' },
+  { id: 'settings', label: 'Settings', icon: SettingsIcon, color: '#94a3b8' },
 ];
 
 function RocketIcon({ className }) {
@@ -85,68 +85,192 @@ function ProgressBar({ progress, color }) {
 }
 
 function App() {
+  const [activeView, setActiveView] = useState('deploy');
   const [frontCardId, setFrontCardId] = useState(null);
+  const [fullScreenId, setFullScreenId] = useState(null);
+  const [closingOverlay, setClosingOverlay] = useState(false);
+
+  const selectedDeployment = DEPLOYMENTS.find((d) => d.id === frontCardId);
+  const fullScreenDeployment = fullScreenId ? DEPLOYMENTS.find((d) => d.id === fullScreenId) : null;
+
+  const openFullScreen = (id) => {
+    setFullScreenId(id);
+    setClosingOverlay(false);
+  };
+
+  const closeFullScreen = () => {
+    setClosingOverlay(true);
+    setTimeout(() => {
+      setFullScreenId(null);
+      setClosingOverlay(false);
+    }, 250);
+  };
+
+  const handleFullScreenToggle = () => {
+    if (fullScreenId) closeFullScreen();
+    else if (frontCardId) openFullScreen(frontCardId);
+  };
+
+  useEffect(() => {
+    if (!fullScreenId) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeFullScreen();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fullScreenId]);
 
   return (
-    <div className="app-bg text-white min-h-screen flex flex-col">
+    <div className="app-bg text-white flex flex-col">
       {/* Corner glow orbs */}
       <div className="glow-orb glow-orb-tl" aria-hidden />
       <div className="glow-orb glow-orb-tr" aria-hidden />
       <div className="glow-orb glow-orb-bl" aria-hidden />
       <div className="glow-orb glow-orb-br" aria-hidden />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col items-center pt-16 pb-32 px-4">
-        {/* Search bar */}
-        <div className="w-full max-w-2xl mb-14">
-          <div className="relative flex items-center rounded-full bg-white/5 border border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-all duration-200">
-            <span className="pl-5 flex-shrink-0 text-white/60">
-              <RocketIcon className="w-5 h-5" />
-            </span>
-            <input
-              type="text"
-              placeholder="What would you like to build?"
-              className="w-full py-4 pl-3 pr-6 bg-transparent text-white placeholder-white/40 outline-none text-base"
-              aria-label="Search or command"
-            />
-          </div>
-        </div>
-
-        {/* Deployment list */}
-        <div className="w-full max-w-4xl flex flex-wrap justify-center gap-6">
-          {DEPLOYMENTS.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              onClick={() => setFrontCardId(frontCardId === d.id ? null : d.id)}
-              className={`deployment-card relative w-full sm:w-[280px] rounded-2xl p-6 text-left bg-white/[0.06] border border-white/10 cursor-pointer ${frontCardId === d.id ? 'pop-front' : ''}`}
-            >
-              <div className="text-white/90 font-medium text-lg mb-3 truncate" title={d.url}>
-                {d.url}
+      {/* Main screen - linear: one view at a time, updated by dock */}
+      <main className="main-screen flex flex-col items-center pt-12 pb-28 px-4">
+        {activeView === 'deploy' && (
+          <div className="view-panel w-full max-w-4xl flex flex-col items-center">
+            {/* Search bar */}
+            <div className="w-full max-w-2xl mb-10">
+              <div className="relative flex items-center rounded-full bg-white/5 border border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-all duration-200">
+                <span className="pl-5 flex-shrink-0 text-white/60">
+                  <RocketIcon className="w-5 h-5" />
+                </span>
+                <input
+                  type="text"
+                  placeholder="What would you like to build?"
+                  className="w-full py-4 pl-3 pr-6 bg-transparent text-white placeholder-white/40 outline-none text-base"
+                  aria-label="Search or command"
+                />
               </div>
-              <ProgressBar progress={d.progress} color={d.color} />
-              <div className="mt-2 text-white/40 text-sm">{d.progress}% complete</div>
-            </button>
-          ))}
-        </div>
+            </div>
+
+            {/* Full Screen toggle - only when a deployment is selected */}
+            {selectedDeployment && (
+              <div className="flex items-center gap-3 mb-6">
+                <button
+                  type="button"
+                  onClick={handleFullScreenToggle}
+                  className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/90 text-sm font-medium hover:bg-white/15 transition-colors"
+                >
+                  Full Screen
+                </button>
+                <span className="text-white/50 text-sm">Selected: {selectedDeployment.url}</span>
+              </div>
+            )}
+
+            {/* Deployment list - frosted glass cards */}
+            <div className="w-full flex flex-wrap justify-center gap-6">
+              {DEPLOYMENTS.map((d) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setFrontCardId(frontCardId === d.id ? null : d.id)}
+                  className={`deployment-card deployment-card-glass relative w-full sm:w-[280px] rounded-2xl p-6 text-left cursor-pointer ${frontCardId === d.id ? 'pop-front' : ''}`}
+                >
+                  <div className="text-white/90 font-medium text-lg mb-3 truncate" title={d.url}>
+                    {d.url}
+                  </div>
+                  <ProgressBar progress={d.progress} color={d.color} />
+                  <div className="mt-2 text-white/40 text-sm">{d.progress}% complete</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeView === 'domains' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Domains</h2>
+            <p className="text-white/50">Manage custom domains for your deployments.</p>
+          </div>
+        )}
+        {activeView === 'ssl' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">SSL</h2>
+            <p className="text-white/50">Certificate and HTTPS settings.</p>
+          </div>
+        )}
+        {activeView === 'monitor' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Monitor</h2>
+            <p className="text-white/50">Uptime and performance metrics.</p>
+          </div>
+        )}
+        {activeView === 'fix' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Fix</h2>
+            <p className="text-white/50">Diagnose and fix deployment issues.</p>
+          </div>
+        )}
+        {activeView === 'automate' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Automate</h2>
+            <p className="text-white/50">Workflows and automation rules.</p>
+          </div>
+        )}
+        {activeView === 'settings' && (
+          <div className="view-panel w-full max-w-2xl text-center py-8">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Settings</h2>
+            <p className="text-white/50">Account and app preferences.</p>
+          </div>
+        )}
       </main>
 
-      {/* Dock */}
+      {/* Dock - colorful icons, updates main screen (linear UI) */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20" aria-label="Main navigation">
-        <div className="dock flex items-center gap-1 px-4 py-3 rounded-2xl bg-white/[0.08] border border-white/10">
+        <div className="dock flex items-center gap-1 px-4 py-3 rounded-2xl border border-white/10">
           {DOCK_ITEMS.map((item) => (
             <button
               key={item.id}
               type="button"
-              className="p-3 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors duration-200"
+              onClick={() => setActiveView(item.id)}
+              className={`p-3 rounded-xl transition-all duration-200 hover:bg-white/10 ${activeView === item.id ? 'bg-white/15' : ''}`}
+              style={{ color: activeView === item.id ? item.color : item.color }}
               title={item.label}
               aria-label={item.label}
+              aria-pressed={activeView === item.id}
             >
               <item.icon className="w-6 h-6" />
             </button>
           ))}
         </div>
       </nav>
+
+      {/* Full-screen overlay: selected deployment brought to front with smooth animation */}
+      {fullScreenDeployment && (
+        <div
+          className={`full-screen-overlay ${closingOverlay ? 'closing' : ''}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Deployment full screen"
+        >
+          <div className="full-screen-card" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-semibold text-white/95 truncate pr-4">{fullScreenDeployment.url}</h3>
+              <button
+                type="button"
+                onClick={closeFullScreen}
+                className="flex-shrink-0 p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Exit full screen"
+              >
+                <span className="text-lg font-bold">×</span>
+              </button>
+            </div>
+            <ProgressBar progress={fullScreenDeployment.progress} color={fullScreenDeployment.color} />
+            <p className="mt-3 text-white/50 text-sm">{fullScreenDeployment.progress}% complete</p>
+          </div>
+          <div
+            className="absolute inset-0"
+            onClick={closeFullScreen}
+            role="button"
+            tabIndex={-1}
+            aria-label="Close overlay"
+          />
+        </div>
+      )}
     </div>
   );
 }
