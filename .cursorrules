@@ -1,0 +1,28 @@
+# Cursor AI Rules for CCLABS
+
+## Project Overview
+This is the CCLABS repository. When working in this codebase, please follow these guidelines:
+
+## Code Style and Standards
+- Write clean, maintainable, and well-documented code
+- Follow standard coding conventions for the language being used
+- Use meaningful variable and function names
+- Add comments for complex logic
+
+## Development Workflow
+- Keep commits focused and atomic
+- Write clear commit messages
+- Test changes before committing
+- Follow the existing project structure
+
+## AI Assistant Guidelines
+- Provide clear explanations for code changes
+- Suggest improvements when appropriate
+- Help identify potential bugs or issues
+- Assist with debugging and troubleshooting
+
+## Best Practices
+- Prioritize code readability over cleverness
+- Consider performance implications
+- Handle errors gracefully
+- Write reusable and modular code
