@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import './App.css';
+
+// --- Aura Builder: JSON blueprint for the page ---
+const siteBlueprint = [
+  { type: 'Hero', id: 'hero', props: { placeholder: 'What would you like to build?' } },
+  { type: 'DeploymentCard', id: 'deployments', props: {} },
+  { type: 'InteractiveDock', id: 'dock', props: {} },
+];
 
 const DEPLOYMENTS = [
   { id: '1', url: 'www.horizonaid.tech', progress: 72, color: 'green' },
@@ -84,18 +92,157 @@ function ProgressBar({ progress, color }) {
   );
 }
 
+// --- Aura Builder: Block components (used by AuraRenderer) ---
+function HeroBlock({ props: blockProps = {}, context }) {
+  const placeholder = blockProps.placeholder || 'What would you like to build?';
+  return (
+    <div className="w-full max-w-2xl mb-10">
+      <div className="relative flex items-center rounded-full bg-white/5 border border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-all duration-200">
+        <span className="pl-5 flex-shrink-0 text-white/60">
+          <RocketIcon className="w-5 h-5" />
+        </span>
+        <input
+          type="text"
+          placeholder={placeholder}
+          className="w-full py-4 pl-3 pr-6 bg-transparent text-white placeholder-white/40 outline-none text-base"
+          aria-label="Search or command"
+        />
+      </div>
+    </div>
+  );
+}
+
+function DeploymentCardBlock({ props: blockProps, context }) {
+  const { frontCardId, setFrontCardId, deployments = DEPLOYMENTS, openFullScreen } = context || {};
+  const selectedDeployment = deployments.find((d) => d.id === frontCardId);
+  return (
+    <div className="w-full flex flex-col items-center gap-6">
+      {selectedDeployment && openFullScreen && (
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => openFullScreen(selectedDeployment.id)}
+            className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/90 text-sm font-medium hover:bg-white/15 transition-colors"
+          >
+            Full Screen
+          </button>
+          <span className="text-white/50 text-sm">Selected: {selectedDeployment.url}</span>
+        </div>
+      )}
+      <div className="w-full flex flex-wrap justify-center gap-6">
+      {deployments.map((d) => (
+        <button
+          key={d.id}
+          type="button"
+          onClick={() => setFrontCardId && setFrontCardId(frontCardId === d.id ? null : d.id)}
+          className={`deployment-card deployment-card-glass relative w-full sm:w-[280px] rounded-2xl p-6 text-left cursor-pointer ${frontCardId === d.id ? 'pop-front' : ''}`}
+        >
+          <div className="text-white/90 font-medium text-lg mb-3 truncate" title={d.url}>
+            {d.url}
+          </div>
+          <ProgressBar progress={d.progress} color={d.color} />
+          <div className="mt-2 text-white/40 text-sm">{d.progress}% complete</div>
+        </button>
+      ))}
+      </div>
+    </div>
+  );
+}
+
+function InteractiveDockBlock({ props: blockProps, context }) {
+  const { activeView, setActiveView, dockItems = DOCK_ITEMS } = context || {};
+  return (
+    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20" aria-label="Main navigation">
+      <div className="dock flex items-center gap-1 px-4 py-3 rounded-2xl border border-white/10">
+        {dockItems.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setActiveView && setActiveView(item.id)}
+            className={`p-3 rounded-xl transition-all duration-200 hover:bg-white/10 ${activeView === item.id ? 'bg-white/15' : ''}`}
+            style={{
+              color: item.color,
+              opacity: activeView === item.id ? 1 : 0.5,
+            }}
+            title={item.label}
+            aria-label={item.label}
+            aria-pressed={activeView === item.id}
+          >
+            <item.icon className="w-6 h-6" />
+          </button>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+const COMPONENT_MAP = {
+  Hero: HeroBlock,
+  DeploymentCard: DeploymentCardBlock,
+  InteractiveDock: InteractiveDockBlock,
+};
+
+// --- Aura Builder: JSON-to-UI renderer with Framer Motion ---
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: (i) => ({
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12,
+      delayChildren: 0.06,
+    },
+  }),
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
+function AuraRenderer({ blueprint, context }) {
+  return (
+    <motion.div
+      className="aura-renderer flex flex-col items-center pt-12 pb-28 px-4 w-full"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {blueprint.map((block, index) => {
+        const Component = COMPONENT_MAP[block.type];
+        if (!Component) return null;
+        return (
+          <motion.div key={block.id || index} variants={itemVariants} className="w-full max-w-4xl flex flex-col items-center">
+            <Component props={block.props || {}} context={context} />
+          </motion.div>
+        );
+      })}
+    </motion.div>
+  );
+}
+
 function App() {
+  const [showSourceCode, setShowSourceCode] = useState(false);
   const [activeView, setActiveView] = useState('deploy');
   const [frontCardId, setFrontCardId] = useState(null);
   const [fullScreenId, setFullScreenId] = useState(null);
   const [closingOverlay, setClosingOverlay] = useState(false);
 
-  const selectedDeployment = DEPLOYMENTS.find((d) => d.id === frontCardId);
   const fullScreenDeployment = fullScreenId ? DEPLOYMENTS.find((d) => d.id === fullScreenId) : null;
 
-  const openFullScreen = (id) => {
-    setFullScreenId(id);
-    setClosingOverlay(false);
+  const openFullScreen = (id) => setFullScreenId(id);
+
+  const auraContext = {
+    activeView,
+    setActiveView,
+    frontCardId,
+    setFrontCardId,
+    deployments: DEPLOYMENTS,
+    dockItems: DOCK_ITEMS,
+    openFullScreen,
   };
 
   const closeFullScreen = () => {
@@ -104,11 +251,6 @@ function App() {
       setFullScreenId(null);
       setClosingOverlay(false);
     }, 250);
-  };
-
-  const handleFullScreenToggle = () => {
-    if (fullScreenId) closeFullScreen();
-    else if (frontCardId) openFullScreen(frontCardId);
   };
 
   useEffect(() => {
@@ -120,126 +262,46 @@ function App() {
     return () => window.removeEventListener('keydown', onKey);
   }, [fullScreenId]);
 
+  const jsonString = JSON.stringify(siteBlueprint, null, 2);
+
   return (
     <div className="app-bg text-white flex flex-col">
-      {/* Corner glow orbs */}
       <div className="glow-orb glow-orb-tl" aria-hidden />
       <div className="glow-orb glow-orb-tr" aria-hidden />
       <div className="glow-orb glow-orb-bl" aria-hidden />
       <div className="glow-orb glow-orb-br" aria-hidden />
 
-      {/* Main screen - linear: one view at a time, updated by dock */}
-      <main className="main-screen flex flex-col items-center pt-12 pb-28 px-4">
-        {activeView === 'deploy' && (
-          <div className="view-panel w-full max-w-4xl flex flex-col items-center">
-            {/* Search bar */}
-            <div className="w-full max-w-2xl mb-10">
-              <div className="relative flex items-center rounded-full bg-white/5 border border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10 transition-all duration-200">
-                <span className="pl-5 flex-shrink-0 text-white/60">
-                  <RocketIcon className="w-5 h-5" />
-                </span>
-                <input
-                  type="text"
-                  placeholder="What would you like to build?"
-                  className="w-full py-4 pl-3 pr-6 bg-transparent text-white placeholder-white/40 outline-none text-base"
-                  aria-label="Search or command"
-                />
-              </div>
-            </div>
+      {/* Source Code toggle - world-class builder style */}
+      <div className="builder-toolbar">
+        <button
+          type="button"
+          onClick={() => setShowSourceCode(!showSourceCode)}
+          className={`builder-toggle ${showSourceCode ? 'active' : ''}`}
+        >
+          Source Code
+        </button>
+      </div>
 
-            {/* Full Screen toggle - only when a deployment is selected */}
-            {selectedDeployment && (
-              <div className="flex items-center gap-3 mb-6">
-                <button
-                  type="button"
-                  onClick={handleFullScreenToggle}
-                  className="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/90 text-sm font-medium hover:bg-white/15 transition-colors"
-                >
-                  Full Screen
-                </button>
-                <span className="text-white/50 text-sm">Selected: {selectedDeployment.url}</span>
-              </div>
-            )}
-
-            {/* Deployment list - frosted glass cards */}
-            <div className="w-full flex flex-wrap justify-center gap-6">
-              {DEPLOYMENTS.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  onClick={() => setFrontCardId(frontCardId === d.id ? null : d.id)}
-                  className={`deployment-card deployment-card-glass relative w-full sm:w-[280px] rounded-2xl p-6 text-left cursor-pointer ${frontCardId === d.id ? 'pop-front' : ''}`}
-                >
-                  <div className="text-white/90 font-medium text-lg mb-3 truncate" title={d.url}>
-                    {d.url}
-                  </div>
-                  <ProgressBar progress={d.progress} color={d.color} />
-                  <div className="mt-2 text-white/40 text-sm">{d.progress}% complete</div>
-                </button>
-              ))}
+      {showSourceCode ? (
+        <div className="builder-split">
+          <div className="builder-panel builder-panel-json">
+            <div className="builder-panel-header">Blueprint JSON</div>
+            <pre className="builder-json">{jsonString}</pre>
+          </div>
+          <div className="builder-panel builder-panel-live">
+            <div className="builder-panel-header">Live Preview</div>
+            <div className="builder-live-inner">
+              <AuraRenderer blueprint={siteBlueprint} context={auraContext} />
             </div>
           </div>
-        )}
-
-        {activeView === 'domains' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Domains</h2>
-            <p className="text-white/50">Manage custom domains for your deployments.</p>
-          </div>
-        )}
-        {activeView === 'ssl' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">SSL</h2>
-            <p className="text-white/50">Certificate and HTTPS settings.</p>
-          </div>
-        )}
-        {activeView === 'monitor' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Monitor</h2>
-            <p className="text-white/50">Uptime and performance metrics.</p>
-          </div>
-        )}
-        {activeView === 'fix' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Fix</h2>
-            <p className="text-white/50">Diagnose and fix deployment issues.</p>
-          </div>
-        )}
-        {activeView === 'automate' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Automate</h2>
-            <p className="text-white/50">Workflows and automation rules.</p>
-          </div>
-        )}
-        {activeView === 'settings' && (
-          <div className="view-panel w-full max-w-2xl text-center py-8">
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Settings</h2>
-            <p className="text-white/50">Account and app preferences.</p>
-          </div>
-        )}
-      </main>
-
-      {/* Dock - colorful icons, updates main screen (linear UI) */}
-      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20" aria-label="Main navigation">
-        <div className="dock flex items-center gap-1 px-4 py-3 rounded-2xl border border-white/10">
-          {DOCK_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setActiveView(item.id)}
-              className={`p-3 rounded-xl transition-all duration-200 hover:bg-white/10 ${activeView === item.id ? 'bg-white/15' : ''}`}
-              style={{ color: activeView === item.id ? item.color : item.color }}
-              title={item.label}
-              aria-label={item.label}
-              aria-pressed={activeView === item.id}
-            >
-              <item.icon className="w-6 h-6" />
-            </button>
-          ))}
         </div>
-      </nav>
+      ) : (
+        <main className="main-screen">
+          <AuraRenderer blueprint={siteBlueprint} context={auraContext} />
+        </main>
+      )}
 
-      {/* Full-screen overlay: selected deployment brought to front with smooth animation */}
+      {/* Full-screen overlay for deployment (when implemented in cards) */}
       {fullScreenDeployment && (
         <div
           className={`full-screen-overlay ${closingOverlay ? 'closing' : ''}`}
@@ -262,13 +324,7 @@ function App() {
             <ProgressBar progress={fullScreenDeployment.progress} color={fullScreenDeployment.color} />
             <p className="mt-3 text-white/50 text-sm">{fullScreenDeployment.progress}% complete</p>
           </div>
-          <div
-            className="absolute inset-0"
-            onClick={closeFullScreen}
-            role="button"
-            tabIndex={-1}
-            aria-label="Close overlay"
-          />
+          <div className="absolute inset-0" onClick={closeFullScreen} role="button" tabIndex={-1} aria-label="Close overlay" />
         </div>
       )}
     </div>
