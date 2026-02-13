@@ -21,7 +21,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Features
 
 - AI-powered website generation
-- Modern React with Next.js 14
+- Modern React with Next.js 15
 - TypeScript support
 - Responsive design
 

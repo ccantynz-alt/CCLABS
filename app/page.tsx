@@ -8,8 +8,8 @@ export default function Home() {
           Build beautiful websites with the power of artificial intelligence.
         </p>
         <div className="cta-buttons">
-          <button className="btn btn-primary">Get Started</button>
-          <button className="btn btn-secondary">Learn More</button>
+          <button className="btn btn-primary" aria-label="Get started with CCLABS AI Website Builder">Get Started</button>
+          <button className="btn btn-secondary" aria-label="Learn more about CCLABS">Learn More</button>
         </div>
       </div>
     </main>
