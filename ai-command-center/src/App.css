@@ -275,3 +275,352 @@
 .builder-live-inner .aura-renderer {
   padding-bottom: 5rem;
 }
+
+/* Aura Core: Self-Heal Fix button – incredible glow */
+.fix-btn-glow {
+  box-shadow: 0 0 24px rgba(249, 115, 22, 0.5), 0 0 48px rgba(249, 115, 22, 0.25);
+  animation: fixGlow 2s ease-in-out infinite;
+}
+@keyframes fixGlow {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(249, 115, 22, 0.5), 0 0 48px rgba(249, 115, 22, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 36px rgba(249, 115, 22, 0.7), 0 0 72px rgba(249, 115, 22, 0.35);
+  }
+}
+
+/* Healing state: card pulse + success ring */
+.healing-pulse {
+  animation: healingPulse 0.6s ease-out;
+}
+@keyframes healingPulse {
+  0% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.85; filter: brightness(1.35); }
+  100% { opacity: 1; filter: brightness(1); }
+}
+
+/* Full-screen DNS/SSL sections */
+.full-screen-section {
+  margin-bottom: 1.25rem;
+}
+.full-screen-section:last-child {
+  margin-bottom: 0;
+}
+.full-screen-section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
+}
+.full-screen-section-content {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+}
+
+/* ─── Aura Nervous System: Vibe (Obsidian vs Cloud) ─── */
+/* Obsidian: dark neon (default) – glowing orbs, high contrast */
+.app-bg.vibe-obsidian { /* base is already obsidian-style */ }
+.app-bg.vibe-obsidian .glow-orb { opacity: 0.35; }
+.app-bg.vibe-obsidian .deployment-card-glass { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+.app-bg.vibe-obsidian .dock { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+
+/* Cloud: light glass – Apple-style whites and grays */
+.app-bg.vibe-cloud {
+  background: linear-gradient(165deg, #f5f5f7 0%, #e8e8ed 40%, #d2d2d9 100%);
+  color: #1d1d1f;
+}
+.app-bg.vibe-cloud .glow-orb {
+  opacity: 0.08;
+  background: radial-gradient(circle, rgba(174,174,178,0.6) 0%, transparent 70%) !important;
+}
+.app-bg.vibe-cloud .deployment-card-glass {
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.app-bg.vibe-cloud .dock {
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+.app-bg.vibe-cloud .builder-toggle {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(0,0,0,0.08);
+  color: #1d1d1f;
+}
+.app-bg.vibe-cloud .builder-toggle:hover { background: rgba(255,255,255,0.9); color: #000; }
+.app-bg.vibe-cloud .builder-toggle.active { background: rgba(0,122,255,0.15); border-color: rgba(0,122,255,0.35); color: #0070e0; }
+.app-bg.vibe-cloud .bento-cell { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.06); color: #1d1d1f; }
+.app-bg.vibe-cloud .bento-cell:hover { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.1); }
+.app-bg.vibe-cloud .bento-cell-label { color: rgba(0,0,0,0.5); }
+.app-bg.vibe-cloud .bento-cell-value { color: #1d1d1f; }
+.app-bg.vibe-cloud .focus-mode-card,
+.app-bg.vibe-cloud .full-screen-card {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.12);
+}
+.app-bg.vibe-cloud .focus-mode-overlay,
+.app-bg.vibe-cloud .full-screen-overlay { background: rgba(0,0,0,0.4); }
+.app-bg.vibe-cloud .focus-progress-label,
+.app-bg.vibe-cloud .full-screen-section-title { color: rgba(0,0,0,0.55); }
+.app-bg.vibe-cloud .agent-terminal { background: rgba(0,0,0,0.85); border-color: rgba(34,197,94,0.4); }
+.app-bg.vibe-cloud input::placeholder { color: rgba(0,0,0,0.4); }
+.app-bg.vibe-cloud input { color: #1d1d1f; }
+.app-bg.vibe-cloud .text-white\/90 { color: rgba(0,0,0,0.9); }
+.app-bg.vibe-cloud .text-white\/40 { color: rgba(0,0,0,0.5); }
+.app-bg.vibe-cloud .text-white\/50 { color: rgba(0,0,0,0.55); }
+.app-bg.vibe-cloud .text-white\/95 { color: rgba(0,0,0,0.95); }
+.app-bg.vibe-cloud .text-white\/70 { color: rgba(0,0,0,0.6); }
+.app-bg.vibe-cloud .builder-panel-header { color: rgba(0,0,0,0.5); border-color: rgba(0,0,0,0.06); }
+.app-bg.vibe-cloud .builder-panel { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.08); }
+.app-bg.vibe-cloud .builder-json { color: #1d1d1f; }
+.app-bg.vibe-cloud .dock-icon-btn { color: inherit; }
+.app-bg.vibe-cloud .critical-error-badge { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #b91c1c; }
+.app-bg.vibe-cloud .progress-track { background: rgba(0,0,0,0.08); }
+.app-bg.vibe-cloud .focus-step-label { color: rgba(0,0,0,0.6); }
+.app-bg.vibe-cloud .focus-step-label.active { color: #1d1d1f; }
+.app-bg.vibe-cloud .focus-step-label.done { color: #16a34a; }
+.app-bg.vibe-cloud h3.text-white\/95 { color: #1d1d1f; }
+.app-bg.vibe-cloud .focus-mode-card .focus-progress-label,
+.app-bg.vibe-cloud .full-screen-card .focus-progress-label { color: rgba(0,0,0,0.55); }
+.app-bg.vibe-cloud .full-screen-card p.text-white\/50 { color: rgba(0,0,0,0.5); }
+.app-bg.vibe-cloud .full-screen-card button { color: rgba(0,0,0,0.7); }
+.app-bg.vibe-cloud .full-screen-card button:hover { color: #1d1d1f; background: rgba(0,0,0,0.06); }
+.app-bg.vibe-cloud .focus-step-dot.done { box-shadow: 0 0 12px rgba(22,163,74,0.5); }
+.app-bg.vibe-cloud .focus-step-dot.active { box-shadow: 0 0 12px rgba(59,130,246,0.5); }
+.app-bg.vibe-cloud .focus-step-line { background: rgba(0,0,0,0.1); }
+.app-bg.vibe-cloud .focus-step-line-fill { background: linear-gradient(90deg,#16a34a,#22c55e); }
+.app-bg.vibe-cloud .focus-step-dot { background: rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.15); }
+.app-bg.vibe-cloud .focus-step-dot.done { background: #16a34a; border-color: #16a34a; }
+.app-bg.vibe-cloud .focus-step-dot.active { background: #2563eb; border-color: #2563eb; }
+.app-bg.vibe-cloud .focus-step-label.done { color: #16a34a; }
+.app-bg.vibe-cloud .focus-step-label.active { color: #2563eb; }
+
+/* Bento box stats */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 32rem;
+}
+.bento-cell {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.bento-cell:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.bento-cell-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.25rem;
+}
+.bento-cell-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* AI Agent terminal (typing fix) */
+.agent-terminal {
+  width: 100%;
+  max-width: 24rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #4ade80;
+  box-shadow: 0 0 24px rgba(34, 197, 94, 0.15);
+}
+.agent-terminal-line::after {
+  content: "▌";
+  animation: terminalBlink 0.8s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes terminalBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Deployment simulator terminal (build log – distinct from Self-Healing agent) */
+.deploy-terminal {
+  width: 100%;
+  max-width: 28rem;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 0.75rem;
+  padding: 0;
+  font-family: ui-monospace, "Cascadia Code", monospace;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #93c5fd;
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.12);
+  overflow: hidden;
+}
+.deploy-terminal-header {
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(147, 197, 253, 0.7);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+}
+.deploy-terminal-line {
+  padding: 0.875rem 1rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.deploy-terminal-line::after {
+  content: "▌";
+  animation: terminalBlink 0.8s step-end infinite;
+  margin-left: 2px;
+}
+.deploy-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.deploy-new-btn:hover {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: rgba(34, 197, 94, 0.6);
+}
+
+/* Dock icon hover glow */
+.dock-icon-btn:hover {
+  filter: drop-shadow(0 0 8px currentColor);
+  transform: scale(1.08);
+}
+.dock-icon-btn {
+  transition: filter 0.2s, transform 0.2s;
+}
+
+/* Focus Mode (zoom into DNS/SSL) */
+.focus-mode-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.focus-mode-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  max-width: 28rem;
+  width: 100%;
+}
+.focus-progress-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
+}
+
+/* Multi-step onboarding (DNS / SSL) */
+.focus-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 0.75rem;
+}
+.focus-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.focus-step:last-child { flex: 0; }
+.focus-step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.2);
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.focus-step-dot.done {
+  background: #22c55e;
+  border-color: #22c55e;
+  box-shadow: 0 0 12px rgba(34,197,94,0.5);
+}
+.focus-step-dot.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  box-shadow: 0 0 12px rgba(59,130,246,0.5);
+}
+.focus-step-line {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  margin: 0 4px;
+  max-width: 48px;
+  overflow: hidden;
+}
+.focus-step-line-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.focus-step-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.45);
+  margin-top: 0.35rem;
+  transition: color 0.25s ease;
+}
+.focus-step-label.done { color: #4ade80; }
+.focus-step-label.active { color: #93c5fd; }
+
+.critical-error-badge {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
