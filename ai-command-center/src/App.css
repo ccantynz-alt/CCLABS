@@ -1,0 +1,90 @@
+/* Deep dark gradient background */
+.app-bg {
+  background: linear-gradient(165deg, #0f0f1a 0%, #0a0a12 40%, #050508 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Corner glowing blur orbs */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+.glow-orb-tl {
+  width: 400px;
+  height: 400px;
+  top: -120px;
+  left: -120px;
+  background: radial-gradient(circle, #3b2d6e 0%, transparent 70%);
+}
+.glow-orb-tr {
+  width: 350px;
+  height: 350px;
+  top: -80px;
+  right: -80px;
+  background: radial-gradient(circle, #1e3a5f 0%, transparent 70%);
+}
+.glow-orb-bl {
+  width: 300px;
+  height: 300px;
+  bottom: -60px;
+  left: -60px;
+  background: radial-gradient(circle, #2d4a3e 0%, transparent 70%);
+}
+.glow-orb-br {
+  width: 320px;
+  height: 320px;
+  bottom: -80px;
+  right: -80px;
+  background: radial-gradient(circle, #4a2d5c 0%, transparent 70%);
+}
+
+/* Progress bar track */
+.progress-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+/* Progress bar fill with glow */
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-fill-green {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+.progress-fill-orange {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+}
+.progress-fill-blue {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Deployment card pop animation */
+.deployment-card {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, z-index 0.25s step-end;
+}
+.deployment-card:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+}
+.deployment-card.pop-front {
+  transform: scale(1.04);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 10;
+}
+
+/* Dock */
+.dock {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
