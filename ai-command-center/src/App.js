@@ -20,6 +20,43 @@ function cn(...args) {
   return clsx(...args);
 }
 
+// Rendering Stress Test: ?stress=N in URL renders N 3D cards + FPS meter
+function getStressCount() {
+  if (typeof window === 'undefined') return 0;
+  const n = parseInt(new URLSearchParams(window.location.search).get('stress'), 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 100) : 0;
+}
+
+function FPSMeter() {
+  const [fps, setFps] = useState(0);
+  const frameCountRef = useRef(0);
+  const lastTimeRef = useRef(performance.now());
+  const rafRef = useRef();
+
+  useEffect(() => {
+    function tick() {
+      frameCountRef.current += 1;
+      const now = performance.now();
+      const elapsed = now - lastTimeRef.current;
+      if (elapsed >= 1000) {
+        setFps(Math.round((frameCountRef.current * 1000) / elapsed));
+        frameCountRef.current = 0;
+        lastTimeRef.current = now;
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    }
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <div className="stress-fps-meter" aria-live="polite">
+      <span className="stress-fps-value">{fps}</span>
+      <span className="stress-fps-label"> FPS</span>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // GLOBAL STATE CONTROLLER – single source of truth (Aura Decathlon: no new files)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -270,20 +307,21 @@ function ShowroomView({ onLaunchLab }) {
           type="button"
           onClick={handleLaunch}
           disabled={hyperdriving}
-          className="showroom-launch-btn mt-12 px-10 py-4 rounded-full text-lg font-semibold tracking-wide border backdrop-blur-xl transition-colors disabled:opacity-70"
-          whileHover={{ scale: 1.03 }}
+          className="showroom-launch-btn showroom-hyperdrive mt-12 px-10 py-4 rounded-full text-lg font-semibold tracking-wide border backdrop-blur-xl transition-colors disabled:opacity-70"
+          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.98 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         >
           {hyperdriving ? (
             <motion.span
-              animate={{ opacity: [1, 0.6, 1] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
+              className="inline-block"
+              animate={{ opacity: [1, 0.7, 1], scale: [1, 1.02, 1] }}
+              transition={{ duration: 0.4, repeat: Infinity }}
             >
-              LAUNCHING…
+              HYPER-DRIVE…
             </motion.span>
           ) : (
-            'Enter the Lab'
+            'Hyper-Drive'
           )}
         </motion.button>
       </motion.div>
@@ -291,10 +329,10 @@ function ShowroomView({ onLaunchLab }) {
         {hyperdriving && (
           <motion.div
             className="hyperdrive-overlay fixed inset-0 z-20 pointer-events-none"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1.1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1.15 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           />
         )}
       </AnimatePresence>
@@ -683,7 +721,7 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
         )}
         onClick={onClick}
         style={{ rotateX, rotateY }}
-        whileHover={{ scale: 1.06 }}
+        whileHover={{ scale: 1.2 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
@@ -766,11 +804,8 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
                   )}
                 </motion.button>
               )}
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -974,7 +1009,7 @@ function generateSocialScript(nightShiftLog) {
   if (deploy.length) lines.push(`We had ${deploy.length} deploy/sync event(s). Vercel status, build logs, and the System Vital orb are all in one place.`);
   if (!ssl.length && !seo.length && !deploy.length && recent.length) lines.push('The night shift log has ' + recent.length + ' entries. Every agent action is stored so we can turn it into content like this.');
   lines.push('');
-  lines.push('CTA: "Link in bio — dominat8.com for the showroom, dominat8.io for the engine. Enter the Lab."');
+  lines.push('CTA: "Link in bio — dominat8.com for the showroom, dominat8.io for the engine. Hit Hyper-Drive."');
   lines.push('');
   lines.push('Vibe: Obsidian theme, dark glass UI. Music: minimal tech / ambient.');
   return lines.join('\n');
@@ -1006,17 +1041,20 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
             aria-hidden
           />
           <motion.aside
-            className="agency-sidebar fixed top-0 right-0 h-full w-full max-w-sm z-50 deployment-card-glass border-l border-white/10 shadow-2xl overflow-y-auto"
+            className="agency-sidebar social-lab-drawer fixed top-0 right-0 h-full w-full max-w-sm z-50 deployment-card-glass border-l border-white/10 shadow-2xl overflow-y-auto"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             <div className="p-6 border-b border-white/10 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-white/95 flex items-center gap-2">
-                <Sparkles className="w-5 h-5" style={{ color: '#8b5cf6' }} />
-                Agency Intelligence
-              </h2>
+              <div>
+                <h2 className="text-lg font-semibold text-white/95 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" style={{ color: '#8b5cf6' }} />
+                  Social Lab
+                </h2>
+                <p className="text-xs text-white/50 mt-0.5">TikTok &amp; Facebook scripts from aura_night_shift</p>
+              </div>
               <button type="button" onClick={onClose} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10" aria-label="Close sidebar"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-4 space-y-6">
@@ -1150,7 +1188,7 @@ const itemVariants = {
 function renderPage(blueprint, context) {
   return (
     <motion.div
-      className="aura-renderer flex flex-col items-center pt-10 pb-28 px-4 w-full"
+      className="aura-render flex flex-col items-center pt-10 pb-28 px-4 w-full"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -1481,6 +1519,23 @@ function App() {
   const agencyLeadRef = useRef(0);
   const [logoHeartbeat, setLogoHeartbeat] = useState(0);
   const [auraMouse, setAuraMouse] = useState({ x: 0.5, y: 0.5 });
+
+  // Rendering Stress Test: ?stress=N renders N 3D cards + FPS meter (max 100)
+  const [stressCount] = useState(() => getStressCount());
+  const stressDeployments = useMemo(() => {
+    if (stressCount <= 0) return [];
+    const out = [];
+    for (let i = 0; i < stressCount; i++) {
+      const base = projectData[i % projectData.length];
+      out.push({
+        ...base,
+        id: `stress-${i}`,
+        url: `${(base.url || '').replace(/^www\./, '')} #${i + 1}`,
+      });
+    }
+    return out;
+  }, [stressCount]);
+  const effectiveDeployments = stressCount > 0 ? stressDeployments : deployments;
 
   const appendNightLog = (message) => {
     const time = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -2104,8 +2159,8 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
   const auraContext = {
     activeView,
     setActiveView,
-    deployments,
-    projectData: deployments,
+    deployments: effectiveDeployments,
+    projectData: effectiveDeployments,
     dockItems: DOCK_ITEMS,
     openFullScreen,
     onFixDeployment,
@@ -2135,7 +2190,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       uptime: '99.98%',
       traffic: '12.4K',
       optimizing: 'Active',
-      speed: deployments.reduce((acc, d) => acc + (d.speed ?? 0), 0) / (deployments.length || 1),
+      speed: effectiveDeployments.reduce((acc, d) => acc + (d.speed ?? 0), 0) / (effectiveDeployments.length || 1),
     },
     agencyTeam,
     activeAgentLead,
@@ -2159,7 +2214,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     : [heroBlock, { type: 'ViewPanel', id: 'view', props: { viewId: activeView } }, dockBlock];
 
   // Developer View: raw JSON blueprint + theme + SEO health (Midnight Architect)
-  const jsonForPanel = { theme: themeConfig, blueprint: siteBlueprint, projectData: deployments, seoHealth };
+  const jsonForPanel = { theme: themeConfig, blueprint: siteBlueprint, projectData: effectiveDeployments, seoHealth };
   const jsonString = JSON.stringify(jsonForPanel, null, 2);
 
   const customOrbVars = {
@@ -2210,9 +2265,26 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       <div className="glow-orb glow-orb-br" aria-hidden />
 
       {/* Aura Pulse 8 logo — breathe synced to 60s Autopilot heartbeat */}
-      <div className="dominat8-engine-logo" aria-hidden>
+      <div className="dominat8-engine-logo nexus-logo-wrap" aria-hidden>
         <Dominat8Logo variant="subtle" heartbeat={logoHeartbeat} />
       </div>
+
+      {/* Biometric heartbeat ripple — spreads across UI when Autopilot loop completes */}
+      <AnimatePresence>
+        {logoHeartbeat > 0 && (
+          <motion.div
+            key={logoHeartbeat}
+            className="nexus-heartbeat-ripple fixed inset-0 z-[8] pointer-events-none"
+            initial={{ opacity: 0.6, scale: 0.3 }}
+            animate={{ opacity: 0, scale: 2.2 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeOut' }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Stress Test: FPS meter when ?stress=N is in URL */}
+      {stressCount > 0 && <FPSMeter />}
 
       {/* Cinematic overlay when Focus Mode on */}
       <AnimatePresence>
@@ -2230,6 +2302,26 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       {/* Toolbar: Bring Forward, Vercel Status, … (hidden in Focus Mode) */}
       {!cinematicFocus && (
       <div className="builder-toolbar flex items-center gap-2">
+        {/* Energy Orbs: Creative (Pink), Dev (Cyan), QA (Amber) — pulse speed reflects active agent */}
+        <div className="nexus-energy-orbs flex items-center gap-2 px-2 border-r border-white/15 mr-1" aria-label="Agent status">
+          {[
+            { key: 'creativeDirector', color: '#ec4899', label: 'Creative' },
+            { key: 'leadDev', color: '#22d3ee', label: 'Dev' },
+            { key: 'qa', color: '#fbbf24', label: 'QA' },
+          ].map((agent, idx) => {
+            const isActive = activeAgentLead === idx;
+            return (
+              <motion.span
+                key={agent.key}
+                className={cn('nexus-orb', isActive && 'nexus-orb-active')}
+                style={{ ['--orb-color']: agent.color }}
+                animate={isActive ? { scale: [1, 1.2, 1], opacity: [0.9, 1, 0.9] } : { scale: 1, opacity: 0.6 }}
+                transition={{ duration: isActive ? 0.8 : 2, repeat: Infinity, ease: 'easeInOut' }}
+                title={`${agent.label}: ${isActive ? 'Active' : 'Idle'}`}
+              />
+            );
+          })}
+        </div>
         <motion.button
           type="button"
           onClick={() => setCinematicFocus(true)}
@@ -2334,10 +2426,10 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Agency Intelligence — live workstations"
+          title="Social Lab — TikTok & Facebook scripts from aura_night_shift"
         >
           <Sparkles className="w-4 h-4" />
-          Agency
+          Social Lab
         </motion.button>
         {/* DNS Status: green when dominat8.io / dominat8.com are valid (Content & Commerce Engine) */}
         <div

@@ -86,13 +86,13 @@
   background: radial-gradient(circle, #4a2d5c 0%, transparent 70%);
 }
 
-/* Holographic glass-morphism: deeper blur + subtle border glow */
+/* Glass-Morphism 2.0: high-density blur (Nexus) */
 .deployment-card-glass {
-  background: rgba(255, 255, 255, calc(0.07 * var(--agency-glass, 1)));
-  backdrop-filter: blur(calc(24px * var(--agency-glass, 1)));
-  -webkit-backdrop-filter: blur(calc(24px * var(--agency-glass, 1)));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, calc(0.08 * var(--agency-glass, 1)));
+  backdrop-filter: blur(calc(32px * var(--agency-glass, 1)));
+  -webkit-backdrop-filter: blur(calc(32px * var(--agency-glass, 1)));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* Team Status widget (Agency Brain) */
@@ -540,8 +540,63 @@
   background: rgba(255,255,255,0.7) !important;
 }
 .showroom-launch-btn:hover { background: rgba(255,255,255,0.9) !important; }
+.showroom-hyperdrive {
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 40px rgba(99, 102, 241, 0.2), 0 8px 32px rgba(0,0,0,0.08);
+}
+.showroom-hyperdrive:hover {
+  box-shadow: 0 0 56px rgba(99, 102, 241, 0.35), 0 8px 32px rgba(0,0,0,0.08);
+}
 .hyperdrive-overlay {
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(240,244,255,0.95) 40%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.92) 0%, rgba(240,244,255,0.95) 35%, transparent 65%);
+}
+
+/* Nexus: Biometric heartbeat ripple (expands from logo when Autopilot ticks) */
+.nexus-heartbeat-ripple {
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.25) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+  border-radius: 50%;
+  transform-origin: 50% 0%;
+}
+
+/* Stress Test: FPS meter when ?stress=N is in URL */
+.stress-fps-meter {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 50;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+  border-radius: 8px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  color: #00d4ff;
+  pointer-events: none;
+}
+.stress-fps-value { font-weight: 700; }
+.stress-fps-label { opacity: 0.85; }
+
+.nexus-logo-wrap {
+  position: relative;
+  z-index: 26;
+}
+
+/* Nexus: Energy Orbs (Creative Pink, Dev Cyan, QA Amber) in toolbar */
+.nexus-energy-orbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.nexus-orb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--orb-color, #94a3b8);
+  box-shadow: 0 0 8px var(--orb-color, #94a3b8);
+  flex-shrink: 0;
+}
+.nexus-orb-active {
+  box-shadow: 0 0 12px var(--orb-color), 0 0 24px var(--orb-color);
 }
 .dominat8-logo {
   display: inline-block;
@@ -666,7 +721,7 @@
   border: 2px solid rgba(255, 255, 255, 0.15);
   transition: box-shadow 0.3s, border-color 0.3s;
 }
-.agent-status-ring.creative { --ring-color: #ec4899; }
+.agent-status-ring.creativeDirector { --ring-color: #ec4899; }
 .agent-status-ring.leadDev { --ring-color: #22d3ee; }
 .agent-status-ring.qa { --ring-color: #fbbf24; }
 .agent-status-ring.marketing { --ring-color: #a78bfa; }
@@ -870,7 +925,7 @@
   overflow: auto;
   min-height: 0;
 }
-.builder-live-inner .aura-renderer {
+.builder-live-inner .aura-render {
   padding-bottom: 5rem;
 }
 
@@ -1046,7 +1101,7 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* AI Agent terminal (typing fix) */
+/* AI Agent terminal — CRT scanline (Hacker vibe) */
 .agent-terminal {
   width: 100%;
   max-width: 24rem;
@@ -1059,6 +1114,22 @@
   line-height: 1.5;
   color: #4ade80;
   box-shadow: 0 0 24px rgba(34, 197, 94, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+.agent-terminal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
 }
 .agent-terminal-line::after {
   content: "▌";
@@ -1070,7 +1141,7 @@
   51%, 100% { opacity: 0; }
 }
 
-/* Deployment simulator terminal (build log – distinct from Self-Healing agent) */
+/* Deployment simulator terminal — CRT scanline (Hacker vibe) */
 .deploy-terminal {
   width: 100%;
   max-width: 28rem;
@@ -1084,6 +1155,21 @@
   color: #93c5fd;
   box-shadow: 0 0 28px rgba(59, 130, 246, 0.12);
   overflow: hidden;
+  position: relative;
+}
+.deploy-terminal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
 }
 .deploy-terminal-header {
   padding: 0.5rem 1rem;
