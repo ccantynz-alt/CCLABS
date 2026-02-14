@@ -1,0 +1,88 @@
+# Aura Builder Auto-Deploy: push to main → build, deploy, then watch and report (Self-Healing Bridge)
+# Repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+# Optional: AURA_WEBHOOK_URL — if set, POSTed when deployment ends in ERROR (so Aura Engine can react)
+name: Aura Builder Auto-Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ai-command-center
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ai-command-center
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} 2>&1)
+          echo "$OUTPUT"
+          echo "deploy_output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        working-directory: ai-command-center
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Watch deployment status (poll and report)
+        id: watch
+        run: |
+          set -e
+          TOKEN="${{ secrets.VERCEL_TOKEN }}"
+          ORG_ID="${{ secrets.VERCEL_ORG_ID }}"
+          PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}"
+          WEBHOOK="${{ secrets.AURA_WEBHOOK_URL }}"
+          if [ -z "$TOKEN" ] || [ -z "$PROJECT_ID" ]; then
+            echo "Skipping watch: VERCEL_TOKEN or VERCEL_PROJECT_ID not set"
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "Polling latest deployment status..."
+          for i in $(seq 1 20); do
+            sleep 15
+            RES=$(curl -s -H "Authorization: Bearer $TOKEN" \
+              "https://api.vercel.com/v6/deployments?projectId=${PROJECT_ID}&limit=1" 2>/dev/null || echo '{"deployments":[]}')
+            STATE=$(echo "$RES" | jq -r '.deployments[0].state // .deployments[0].readyState // "UNKNOWN"' 2>/dev/null || echo "UNKNOWN")
+            echo "  Attempt $i: state=$STATE"
+            if [ "$STATE" = "READY" ]; then
+              echo "status=ready" >> $GITHUB_OUTPUT
+              echo "Deployment READY."
+              exit 0
+            fi
+            if [ "$STATE" = "ERROR" ]; then
+              echo "status=error" >> $GITHUB_OUTPUT
+              echo "Deployment ERROR detected."
+              if [ -n "$WEBHOOK" ]; then
+                echo "Notifying Aura Engine webhook..."
+                curl -s -X POST -H "Content-Type: application/json" -d '{"event":"deployment_error","source":"github"}' "$WEBHOOK" || true
+              fi
+              exit 1
+            fi
+          done
+          echo "status=timeout" >> $GITHUB_OUTPUT
+          echo "Polling timed out; deployment may still be building."
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          AURA_WEBHOOK_URL: ${{ secrets.AURA_WEBHOOK_URL }}
