@@ -1,12 +1,52 @@
-/* Deep dark gradient background - full screen */
+/* Cinematic: mesh gradient background - shifts by system health */
 .app-bg {
-  background: linear-gradient(165deg, #0f0f1a 0%, #0a0a12 40%, #050508 100%);
+  --mesh-primary: #0f0f1a;
+  --mesh-mid: #0a0a12;
+  --mesh-bottom: #050508;
+  --mesh-accent: 59, 130, 246;
+  --mesh-accent-amt: 0.08;
+  background:
+    radial-gradient(ellipse 120% 80% at 20% 20%, rgba(var(--mesh-accent), var(--mesh-accent-amt)) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 60% at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+    linear-gradient(165deg, var(--mesh-primary) 0%, var(--mesh-mid) 40%, var(--mesh-bottom) 100%);
   min-height: 100vh;
   height: 100vh;
   position: relative;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
+  transition: background 0.6s ease, --mesh-accent 0.6s ease;
+}
+.app-bg[data-health="error"] {
+  --mesh-accent: 239, 68, 68;
+  --mesh-accent-amt: 0.12;
+}
+.app-bg[data-health="ok"] {
+  --mesh-accent: 59, 130, 246;
+  --mesh-accent-amt: 0.08;
+}
+
+/* Cursor-following Aura gradient (holographic glass-morphism) */
+.aura-cursor-layer {
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    circle  clamp(280px, 40vmax, 500px) at calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%),
+    rgba(99, 102, 241, 0.12) 0%,
+    rgba(139, 92, 246, 0.06) 35%,
+    transparent 60%
+  );
+  transition: background 0.15s ease-out;
+}
+.app-bg[data-health="error"] .aura-cursor-layer {
+  background: radial-gradient(
+    circle clamp(280px, 40vmax, 500px) at calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%),
+    rgba(239, 68, 68, 0.08) 0%,
+    rgba(220, 38, 38, 0.04) 40%,
+    transparent 65%
+  );
 }
 
 /* Corner glowing blur orbs (Agency Brain: Creative Director tweaks --agency-glow) */
@@ -46,12 +86,13 @@
   background: radial-gradient(circle, #4a2d5c 0%, transparent 70%);
 }
 
-/* Frosted glass deployment cards (Agency Brain: --agency-glass) */
+/* Holographic glass-morphism: deeper blur + subtle border glow */
 .deployment-card-glass {
-  background: rgba(255, 255, 255, calc(0.06 * var(--agency-glass, 1)));
-  backdrop-filter: blur(calc(16px * var(--agency-glass, 1)));
-  -webkit-backdrop-filter: blur(calc(16px * var(--agency-glass, 1)));
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, calc(0.07 * var(--agency-glass, 1)));
+  backdrop-filter: blur(calc(24px * var(--agency-glass, 1)));
+  -webkit-backdrop-filter: blur(calc(24px * var(--agency-glass, 1)));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* Team Status widget (Agency Brain) */
@@ -225,12 +266,25 @@
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, z-index 0.25s step-end;
 }
 .deployment-card:hover {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3), 0 0 40px rgba(99, 102, 241, 0.15);
 }
 .deployment-card.pop-front {
   transform: scale(1.04);
   box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
   z-index: 10;
+}
+/* 3D Zoom-to-Build: tilt and zoom toward user on hover */
+.deployment-card-3d {
+  transform-style: preserve-3d;
+  perspective: 1200px;
+}
+.deployment-card-3d-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.deployment-card-3d-inner:hover {
+  transform: scale(1.06) translateZ(24px);
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.4), 0 0 48px rgba(99, 102, 241, 0.2);
 }
 
 /* Dock - frosted with colorful icons */
@@ -525,6 +579,16 @@
   opacity: 0.35;
   filter: brightness(0) invert(1);
 }
+.dominat8-logo-subtle.aura-pulse .dominat8-logo-img {
+  animation: auraLogoBreathe 60s ease-in-out infinite;
+  filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+}
+@keyframes auraLogoBreathe {
+  0%, 100% { opacity: 0.4; transform: scale(1); filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(99, 102, 241, 0.4)); }
+  2%   { opacity: 0.9; transform: scale(1.08); filter: brightness(0) invert(1) drop-shadow(0 0 16px rgba(99, 102, 241, 0.9)); }
+  4%   { opacity: 0.4; transform: scale(1); filter: brightness(0) invert(1) drop-shadow(0 0 6px rgba(99, 102, 241, 0.4)); }
+  6%, 98% { opacity: 0.35; transform: scale(1); }
+}
 .showroom-bg .dominat8-logo-hero .dominat8-logo-img {
   opacity: 0.2;
   filter: none;
@@ -545,6 +609,29 @@
 .cinematic-dim {
   background: rgba(0,0,0,0.5);
 }
+/* Cinematic Mode: full-screen focus, sidebars hidden, terminal centered */
+.app-bg.cinematic-mode .main-content-wrap {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+.app-bg.cinematic-mode .main-screen {
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+.app-bg.cinematic-mode .deployment-card,
+.app-bg.cinematic-mode .dock { display: none; }
+.app-bg.cinematic-mode .bento-grid { margin-bottom: 1rem; }
+
 .main-content-wrap {
   position: relative;
   z-index: 5;
@@ -567,6 +654,39 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
+/* Agency Intelligence: glowing status rings (Creative=Pink, Dev=Cyan, QA=Amber) */
+.agent-status-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.agent-status-ring.creative { --ring-color: #ec4899; }
+.agent-status-ring.leadDev { --ring-color: #22d3ee; }
+.agent-status-ring.qa { --ring-color: #fbbf24; }
+.agent-status-ring.marketing { --ring-color: #a78bfa; }
+.agent-status-ring.working {
+  border-color: var(--ring-color);
+  box-shadow: 0 0 20px var(--ring-color), 0 0 40px rgba(0, 0, 0, 0.3);
+}
+.agent-brain-icon {
+  width: 24px;
+  height: 24px;
+  opacity: 0.9;
+}
+.agent-status-ring.working .agent-brain-icon {
+  animation: agentBrainPulse 1.5s ease-in-out infinite;
+}
+@keyframes agentBrainPulse {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
 .morning-report-modal {
   max-height: 90vh;
   overflow-y: auto;
@@ -987,6 +1107,28 @@
   animation: terminalBlink 0.8s step-end infinite;
   margin-left: 2px;
 }
+
+/* Matrix-style terminal: lines fade in like typed by AI */
+.terminal-matrix .terminal-line {
+  opacity: 0;
+  animation: terminalLineFadeIn 0.4s ease-out forwards;
+}
+.terminal-matrix .terminal-line:nth-child(1) { animation-delay: 0.05s; }
+.terminal-matrix .terminal-line:nth-child(2) { animation-delay: 0.12s; }
+.terminal-matrix .terminal-line:nth-child(3) { animation-delay: 0.19s; }
+.terminal-matrix .terminal-line:nth-child(4) { animation-delay: 0.26s; }
+.terminal-matrix .terminal-line:nth-child(5) { animation-delay: 0.33s; }
+.terminal-matrix .terminal-line:nth-child(6) { animation-delay: 0.4s; }
+.terminal-matrix .terminal-line:nth-child(7) { animation-delay: 0.47s; }
+.terminal-matrix .terminal-line:nth-child(8) { animation-delay: 0.54s; }
+.terminal-matrix .terminal-line:nth-child(9) { animation-delay: 0.61s; }
+.terminal-matrix .terminal-line:nth-child(10) { animation-delay: 0.68s; }
+.terminal-matrix .terminal-line:nth-child(n+11) { animation-delay: 0.75s; }
+@keyframes terminalLineFadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .deploy-new-btn {
   display: inline-flex;
   align-items: center;

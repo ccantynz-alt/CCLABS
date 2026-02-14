@@ -1,8 +1,20 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
+
+// Animated brain icon for agents (pulses when working)
+function AgentBrainIcon({ className, color = 'currentColor' }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path d="M12 4a4 4 0 0 1 4 4c0 1.5-.8 2.8-2 3.5M12 4a4 4 0 0 0-4 4c0 1.5.8 2.8 2 3.5M12 4v2M8 8c0-1.5.8-2.8 2-3.5M16 8c0-1.5-.8-2.8-2-3.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 10v10M9 14l3 3 3-3" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="18" r="1.5" fill={color} opacity="0.8" />
+      <path d="M5 14c0 2 1.5 4 4 4h6c2.5 0 4-2 4-4" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.7" />
+    </svg>
+  );
+}
 
 function cn(...args) {
   return clsx(...args);
@@ -181,13 +193,15 @@ const DEPLOY_SCRIPT = [
   'Done. Status: OK',
 ].join('\n');
 
-// Dominat8 "8" logo: uses logo-8.svg (same as favicon) — hero (massive pulsing) or subtle (engine)
+// Dominat8 "8" logo: Aura Pulse synced to 60s Autopilot heartbeat (engine)
 const LOGO_8_SRC = process.env.PUBLIC_URL ? `${process.env.PUBLIC_URL}/logo-8.svg` : '/logo-8.svg';
-function Dominat8Logo({ variant = 'subtle' }) {
+function Dominat8Logo({ variant = 'subtle', heartbeat = 0 }) {
   const isHero = variant === 'hero';
+  const pulseClass = !isHero && heartbeat !== undefined ? 'aura-pulse' : '';
   return (
     <motion.span
-      className={cn('dominat8-logo', isHero ? 'dominat8-logo-hero' : 'dominat8-logo-subtle')}
+      key={isHero ? 'hero' : heartbeat}
+      className={cn('dominat8-logo', isHero ? 'dominat8-logo-hero' : 'dominat8-logo-subtle', pulseClass)}
       animate={isHero ? { scale: [1, 1.03, 1], opacity: [0.5, 0.7, 0.5] } : {}}
       transition={isHero ? { duration: 2.5, repeat: Infinity, ease: 'easeInOut' } : {}}
       aria-hidden
@@ -288,10 +302,11 @@ function ShowroomView({ onLaunchLab }) {
   );
 }
 
-// AuraTerminal: reusable for both Deployment logs and Agent fix (Decathlon)
-function AuraTerminal({ type = 'agent', content = '', title }) {
+// AuraTerminal: Matrix-style fade-in lines (typed-by-AI feel) + blink cursor
+function AuraTerminal({ type = 'agent', content = '', title, matrixStyle = true }) {
   const isDeploy = type === 'deploy';
   const className = isDeploy ? 'deploy-terminal' : 'agent-terminal';
+  const lines = (content || '').split('\n');
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -299,25 +314,31 @@ function AuraTerminal({ type = 'agent', content = '', title }) {
       className={className}
     >
       {isDeploy && title && <div className="deploy-terminal-header">{title}</div>}
-      <div className={isDeploy ? 'deploy-terminal-line' : 'agent-terminal-line'} style={{ whiteSpace: 'pre-wrap' }}>
-        {content}
+      <div className={cn(isDeploy ? 'deploy-terminal-line' : 'agent-terminal-line', matrixStyle && lines.length > 0 && 'terminal-matrix')} style={!(matrixStyle && lines.length > 0) ? { whiteSpace: 'pre-wrap' } : undefined}>
+        {matrixStyle && lines.length > 0
+          ? lines.map((line, i) => <div key={i} className="terminal-line" style={{ whiteSpace: 'pre-wrap' }}>{line || '\u00A0'}</div>)
+          : content}
       </div>
     </motion.div>
   );
 }
 
-// Team Status widget: which agent is currently "Working" with glowing pulse (Agency Brain)
+// Team Status widget: Agent brain avatars + glowing status rings (Cinematic)
+const AGENT_RING_COLORS = { creativeDirector: '#ec4899', leadDev: '#22d3ee', qa: '#fbbf24', marketing: '#a78bfa' };
 function TeamStatusWidget({ agencyTeam = {}, activeAgentLead }) {
   return (
     <div className="team-status-widget">
-      <div className="team-status-header">Team Status</div>
+      <div className="team-status-header">Agency Intelligence</div>
       <ul className="team-status-list" aria-label="Agency agents">
         {AGENCY_AGENTS.map((agent, idx) => {
           const status = agencyTeam[agent.key] || 'idle';
           const isWorking = status === 'working' || idx === activeAgentLead;
+          const ringColor = AGENT_RING_COLORS[agent.key] || '#94a3b8';
           return (
             <li key={agent.key} data-agent={agent.key} className={cn('team-status-item', isWorking && 'team-status-working')}>
-              <span className="team-status-dot" aria-hidden />
+              <span className={cn('agent-status-ring', agent.key, isWorking && 'working')} aria-hidden>
+                <AgentBrainIcon className="agent-brain-icon" color={ringColor} />
+              </span>
               <span className="team-status-label">{agent.short}</span>
             </li>
           );
@@ -606,19 +627,66 @@ function DeploymentCardBlock({ props: blockProps, context }) {
           const isError = d.status === 'Error' || (selfHealingOn && d.id === errorDeploymentId);
           const isHealing = healingId === d.id;
           return (
-            <motion.div
+            <DeploymentCard3D
               key={d.id}
-              layout
               layoutId={fullScreenId === d.id ? `deploy-card-${d.id}` : undefined}
-              className={cn(
-                'deployment-card deployment-card-glass relative w-full sm:w-[280px] rounded-2xl p-6 text-left cursor-pointer overflow-hidden',
-                isHealing && 'healing-pulse'
-              )}
+              isHealing={isHealing}
               onClick={() => openFullScreen && openFullScreen(d.id)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            >
+              isError={isError}
+              d={d}
+              taskColor={taskColor}
+              agentTypingText={agentTypingText}
+              onFixDeployment={onFixDeployment}
+              selfHealingOn={selfHealingOn}
+              healingId={healingId}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// 3D Zoom-to-Build card: tilt from mouse, zoom forward on hover
+function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor, agentTypingText, onFixDeployment, selfHealingOn, healingId }) {
+  const cardRef = useRef(null);
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const rotateX = useTransform(mouseY, [0, 1], [8, -8]);
+  const rotateY = useTransform(mouseX, [0, 1], [-8, 8]);
+  const handleMouseMove = useCallback((e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mouseX.set(x);
+    mouseY.set(y);
+  }, [mouseX, mouseY]);
+  const handleMouseLeave = useCallback(() => {
+    mouseX.set(0.5);
+    mouseY.set(0.5);
+  }, [mouseX, mouseY]);
+  return (
+    <motion.div
+      ref={cardRef}
+      layout
+      layoutId={layoutId}
+      className="deployment-card deployment-card-3d w-full sm:w-[280px]"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ perspective: 1200 }}
+    >
+      <motion.div
+        className={cn(
+          'deployment-card-3d-inner deployment-card deployment-card-glass relative rounded-2xl p-6 text-left cursor-pointer overflow-hidden',
+          isHealing && 'healing-pulse'
+        )}
+        onClick={onClick}
+        style={{ rotateX, rotateY }}
+        whileHover={{ scale: 1.06 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+      >
               {isHealing && (
                 <motion.div
                   className="absolute inset-0 rounded-2xl border-2 border-emerald-400/60 pointer-events-none"
@@ -918,10 +986,12 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
   const creativeTasks = nightShiftLog.filter((e) => e.message.startsWith('Creative') || e.message.startsWith('Vibe-Sync')).slice(-5).reverse();
   const leadDevTasks = nightShiftLog.filter((e) => e.message.startsWith('Lead Dev')).slice(-5).reverse();
   const qaTasks = nightShiftLog.filter((e) => e.message.startsWith('QA')).slice(-5).reverse();
+  const marketingTasks = nightShiftLog.filter((e) => e.message.startsWith('Marketing')).slice(-5).reverse();
   const workstations = [
-    { key: 'creativeDirector', label: 'Creative Director', short: 'Creative', tasks: creativeTasks, color: '#ec4899', Icon: Sparkles },
-    { key: 'leadDev', label: 'Lead Dev', short: 'Lead Dev', tasks: leadDevTasks, color: '#3b82f6', Icon: Wrench },
-    { key: 'qa', label: 'QA', short: 'QA', tasks: qaTasks, color: '#22c55e', Icon: Monitor },
+    { key: 'creativeDirector', label: 'Creative Director', short: 'Creative', tasks: creativeTasks, color: '#ec4899' },
+    { key: 'leadDev', label: 'Lead Dev', short: 'Lead Dev', tasks: leadDevTasks, color: '#22d3ee' },
+    { key: 'qa', label: 'QA', short: 'QA', tasks: qaTasks, color: '#fbbf24' },
+    { key: 'marketing', label: 'Marketing', short: 'Marketing', tasks: marketingTasks, color: '#a78bfa' },
   ];
   return (
     <AnimatePresence>
@@ -951,8 +1021,7 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
             </div>
             <div className="p-4 space-y-6">
               {workstations.map((ws, idx) => {
-                const isWorking = (idx === 0 && activeAgentLead === 0) || (idx === 1 && activeAgentLead === 1) || (idx === 2 && activeAgentLead === 2);
-                const Icon = ws.Icon;
+                const isWorking = idx === activeAgentLead;
                 return (
                   <motion.div
                     key={ws.key}
@@ -961,8 +1030,10 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 * idx }}
                   >
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="workstation-dot" style={{ background: ws.color, boxShadow: isWorking ? `0 0 12px ${ws.color}` : 'none' }} />
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className={cn('agent-status-ring', ws.key, isWorking && 'working')} aria-hidden>
+                        <AgentBrainIcon className="agent-brain-icon" color={ws.color} />
+                      </span>
                       <span className="font-semibold text-white/90" style={{ color: ws.color }}>{ws.label}</span>
                       {isWorking && <motion.span className="text-xs text-white/50" animate={{ opacity: [0.5, 1] }} transition={{ repeat: Infinity, duration: 1 }}>Working...</motion.span>}
                     </div>
@@ -1408,6 +1479,8 @@ function App() {
   const [activeAgentLead, setActiveAgentLead] = useState(0);
   const [agencyTweak, setAgencyTweak] = useState({ glow: 1, glass: 1 });
   const agencyLeadRef = useRef(0);
+  const [logoHeartbeat, setLogoHeartbeat] = useState(0);
+  const [auraMouse, setAuraMouse] = useState({ x: 0.5, y: 0.5 });
 
   const appendNightLog = (message) => {
     const time = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -1971,6 +2044,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     }
 
     midnightCycleRef.current += 1;
+    setLogoHeartbeat((n) => n + 1);
   };
 
   useEffect(() => {
@@ -2108,6 +2182,10 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     );
   }
 
+  const onMouseMoveAura = useCallback((e) => {
+    setAuraMouse({ x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight });
+  }, []);
+
   return (
     <div
       className={cn(
@@ -2117,16 +2195,23 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         nightShiftLog.length > 0 && 'has-night-feed',
         cinematicFocus && 'cinematic-mode'
       )}
-      style={customOrbVars}
+      style={{
+        ...customOrbVars,
+        ['--mouse-x']: auraMouse.x,
+        ['--mouse-y']: auraMouse.y,
+      }}
+      data-health={deploymentStatus}
+      onMouseMove={onMouseMoveAura}
     >
+      <div className="aura-cursor-layer" aria-hidden />
       <div className="glow-orb glow-orb-tl" aria-hidden />
       <div className="glow-orb glow-orb-tr" aria-hidden />
       <div className="glow-orb glow-orb-bl" aria-hidden />
       <div className="glow-orb glow-orb-br" aria-hidden />
 
-      {/* Subtle 8 logo (Engine branding) */}
+      {/* Aura Pulse 8 logo — breathe synced to 60s Autopilot heartbeat */}
       <div className="dominat8-engine-logo" aria-hidden>
-        <Dominat8Logo variant="subtle" />
+        <Dominat8Logo variant="subtle" heartbeat={logoHeartbeat} />
       </div>
 
       {/* Cinematic overlay when Focus Mode on */}
@@ -2152,10 +2237,10 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Full Screen Focus — immersive build view"
+          title="Cinematic Mode — hide sidebars, center build terminal"
         >
           <Maximize2 className="w-4 h-4" />
-          Focus
+          Cinematic
         </motion.button>
         <motion.button
           type="button"
