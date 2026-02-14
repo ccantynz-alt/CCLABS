@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2 } from 'lucide-react';
+import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
 
@@ -179,8 +179,16 @@ function suggestPatchForTicket(text) {
   return { type: 'css', code: '/* Generic UI polish */\n.deploy-new-btn { transition: transform 0.2s, box-shadow 0.2s; }\n.deploy-new-btn:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(34,197,94,0.3); }' };
 }
 
+// Empire: Prime blueprints for Blueprint Marketplace (3D hover, One-Click Install)
+const PRIME_BLUEPRINTS = [
+  { id: 'luxury-real-estate', name: 'Luxury Real Estate', description: 'High-end listings, hero imagery, trust badges.', accent: '#c9a227', heroSubtitle: 'Elite properties worldwide.' },
+  { id: 'high-fashion-ecom', name: 'High-Fashion E-com', description: 'Editorial layout, lookbook grid, checkout-ready.', accent: '#ec4899', heroSubtitle: 'Where style meets commerce.' },
+  { id: 'saas-dashboard', name: 'SaaS Dashboard', description: 'Metrics, charts, team roles, and billing.', accent: '#3b82f6', heroSubtitle: 'Ship faster. Scale smarter.' },
+];
+
 const DOCK_ITEMS = [
   { id: 'deploy', label: 'Deploy', Icon: Rocket, color: '#22c55e' },
+  { id: 'revenue', label: 'Revenue', Icon: DollarSign, color: '#10b981' },
   { id: 'domains', label: 'Domains', Icon: Globe, color: '#3b82f6' },
   { id: 'ssl', label: 'SSL', Icon: Lock, color: '#eab308' },
   { id: 'monitor', label: 'Monitor', Icon: Monitor, color: '#a855f7' },
@@ -199,6 +207,15 @@ const AGENCY_AGENTS = [
 ];
 
 const AGENT_FIX_SCRIPT = 'Detecting SSL failure on horizonaid.tech...\nApplying certificate renewal...\nCertificate renewed. Status: OK';
+
+// Mock build logs for "Simulate error" — record Self-Healing TikTok without a real Vercel failure
+const MOCK_BUILD_LOGS = `[09:42:11] Building...
+[09:42:14] Installing dependencies
+[09:42:18] Build failed: Module not found: 'react-helmet'
+[09:42:18] Error: Cannot find module 'react-helmet'
+[09:42:18] at Function.Module._resolveFilename (node:internal/modules/cjs/loader:119:15)
+[09:42:19] Lead Dev: Analyzing Vercel build logs for repair.
+[09:42:20] Suggested fix: Add react-helmet to package.json or replace with react-helmet-async`;
 
 // Midnight Architect: domains cycled every 60s (Persistent Autopilot)
 const MIDNIGHT_DOMAINS = [
@@ -266,9 +283,24 @@ function ProgressBar({ progress, color, taskColor }) {
   );
 }
 
-// Luxury Hero Showroom (.com): Cloud theme, pulsing 8, "Enter the Lab" → redirects to .io (Empire State)
+// Luxury Hero Showroom (.com): Cloud theme, pulsing 8, Hyper-Drive CTA — subtle 3D tilt (Nexus language)
 function ShowroomView({ onLaunchLab }) {
   const [hyperdriving, setHyperdriving] = useState(false);
+  const panelRef = useRef(null);
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const rotateX = useTransform(mouseY, [0, 1], [4, -4]);
+  const rotateY = useTransform(mouseX, [0, 1], [-4, 4]);
+  const handleMouseMove = useCallback((e) => {
+    if (!panelRef.current) return;
+    const rect = panelRef.current.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left) / rect.width);
+    mouseY.set((e.clientY - rect.top) / rect.height);
+  }, [mouseX, mouseY]);
+  const handleMouseLeave = useCallback(() => {
+    mouseX.set(0.5);
+    mouseY.set(0.5);
+  }, [mouseX, mouseY]);
   const handleLaunch = () => {
     setHyperdriving(true);
     try {
@@ -291,10 +323,14 @@ function ShowroomView({ onLaunchLab }) {
     >
       <div className="showroom-gradient" aria-hidden />
       <motion.div
-        className="showroom-content relative z-10 flex flex-col items-center justify-center text-center px-6"
+        ref={panelRef}
+        className="showroom-content showroom-content-3d relative z-10 flex flex-col items-center justify-center text-center px-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ perspective: 1000, rotateX, rotateY }}
       >
         <Dominat8Logo variant="hero" />
         <h1 className="showroom-title mt-6 text-4xl sm:text-5xl font-light tracking-tight">
@@ -617,7 +653,8 @@ function DeploymentCardBlock({ props: blockProps, context }) {
             deploymentStatus === 'error' && 'system-vital-error'
           )}
           role="status"
-          aria-label={deploymentStatus === 'ok' ? 'Vercel healthy' : deploymentStatus === 'error' ? 'Deployment error' : 'Unknown'}
+          aria-label={deploymentStatus === 'ok' ? 'Vercel status: healthy' : deploymentStatus === 'error' ? 'Vercel status: error' : 'Vercel status: unknown'}
+          title={deploymentStatus === 'ok' ? 'Vercel status: healthy' : deploymentStatus === 'error' ? 'Vercel status: error' : 'Vercel status: unknown'}
         />
       </div>
       <div className="w-full max-w-4xl flex flex-col sm:flex-row items-stretch gap-4 justify-center">
@@ -685,13 +722,15 @@ function DeploymentCardBlock({ props: blockProps, context }) {
   );
 }
 
-// 3D Zoom-to-Build card: tilt from mouse, zoom forward on hover
+// 3D Stage card: tilt from mouse, flip on hover to reveal SEO / Speed / Revenue (ACC)
 function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor, agentTypingText, onFixDeployment, selfHealingOn, healingId }) {
   const cardRef = useRef(null);
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
+  const flipY = useMotionValue(0);
   const rotateX = useTransform(mouseY, [0, 1], [8, -8]);
-  const rotateY = useTransform(mouseX, [0, 1], [-8, 8]);
+  const rotateYMouse = useTransform(mouseX, [0, 1], [-8, 8]);
+  const rotateY = useTransform(() => rotateYMouse.get() + flipY.get());
   const handleMouseMove = useCallback((e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -703,7 +742,11 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
   const handleMouseLeave = useCallback(() => {
     mouseX.set(0.5);
     mouseY.set(0.5);
-  }, [mouseX, mouseY]);
+    flipY.set(0);
+  }, [mouseX, mouseY, flipY]);
+  const handleMouseEnter = useCallback(() => { flipY.set(180); }, [flipY]);
+  const seoScore = Math.min(99, Math.max(70, (d.progress || 0) + 10));
+  const speedVal = d.speed != null ? Math.round(d.speed) : '—';
   return (
     <motion.div
       ref={cardRef}
@@ -712,19 +755,21 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
       className="deployment-card deployment-card-3d w-full sm:w-[280px]"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={handleMouseEnter}
       style={{ perspective: 1200 }}
     >
       <motion.div
         className={cn(
-          'deployment-card-3d-inner deployment-card deployment-card-glass relative rounded-2xl p-6 text-left cursor-pointer overflow-hidden',
+          'deployment-card-3d-inner deployment-card deployment-card-glass deployment-card-flip relative rounded-2xl p-0 text-left cursor-pointer overflow-hidden',
           isHealing && 'healing-pulse'
         )}
         onClick={onClick}
         style={{ rotateX, rotateY }}
-        whileHover={{ scale: 1.2 }}
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
       >
+        <div className="deployment-card-face deployment-card-front rounded-2xl p-6">
               {isHealing && (
                 <motion.div
                   className="absolute inset-0 rounded-2xl border-2 border-emerald-400/60 pointer-events-none"
@@ -804,6 +849,25 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
                   )}
                 </motion.button>
               )}
+        </div>
+        <div className="deployment-card-face deployment-card-back rounded-2xl p-6 flex flex-col items-center justify-center gap-4 text-center">
+          <span className="text-white/50 text-xs uppercase tracking-wider">Metrics</span>
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">SEO</span>
+              <span className="text-emerald-400 font-semibold">{seoScore}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">Speed</span>
+              <span className="text-cyan-300 font-semibold">{speedVal}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-white/50">Revenue</span>
+              <span className="text-amber-400 font-semibold">—</span>
+            </div>
+          </div>
+          <p className="text-white/40 text-xs">Hover to flip back</p>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -811,6 +875,7 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
 
 // View panel shown when a dock item other than Deploy is selected (navigation content)
 const VIEW_PANEL_CONFIG = {
+  revenue: { label: 'Revenue', description: 'Affiliate links and referral revenue from Built with Dominat8.', Icon: DollarSign },
   domains: { label: 'Domains', description: 'Manage custom domains and DNS records.', Icon: Globe },
   ssl: { label: 'SSL', description: 'Certificates and HTTPS status for your deployments.', Icon: Lock },
   monitor: { label: 'Monitor', description: 'Uptime, logs, and performance metrics.', Icon: Monitor },
@@ -825,6 +890,51 @@ function ViewPanelBlock({ props: blockProps, context }) {
   const config = VIEW_PANEL_CONFIG[viewId] || VIEW_PANEL_CONFIG.domains;
   const Icon = config.Icon;
   const nightShiftLog = context?.nightShiftLog || [];
+
+  if (viewId === 'revenue') {
+    const referralBase = 'https://dominat8.io?ref=';
+    const referralCode = context?.referralCode || 'dashboard';
+    const referralLink = referralBase + referralCode;
+    const badgeSnippet = `<a href="${referralLink}" target="_blank" rel="noopener" class="dominat8-badge">Built with Dominat8</a>`;
+    return (
+      <motion.div
+        className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <span style={{ color: '#10b981' }}>
+            <DollarSign className="w-8 h-8" />
+          </span>
+          <h2 className="text-xl font-semibold text-white/95">Revenue & Affiliate</h2>
+        </div>
+        <p className="text-white/60 text-sm mb-4">Every site built with Dominat8 shows a high-end referral badge. When a visitor signs up via your link, you share the revenue.</p>
+        <div className="rounded-xl bg-white/5 px-4 py-3 border border-white/10 mb-4">
+          <div className="text-white/50 text-xs uppercase tracking-wider mb-1">Your referral link (use on all child deployments)</div>
+          <code className="text-emerald-400/90 text-sm break-all font-mono">{referralLink}</code>
+          <button
+            type="button"
+            className="mt-2 text-xs text-emerald-400 hover:text-emerald-300"
+            onClick={() => navigator.clipboard?.writeText(referralLink)}
+          >
+            Copy link
+          </button>
+        </div>
+        <div className="rounded-xl bg-white/5 px-4 py-3 border border-white/10">
+          <div className="text-white/50 text-xs uppercase tracking-wider mb-2">Built with Dominat8 badge (embed on every site)</div>
+          <pre className="text-white/70 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">{badgeSnippet}</pre>
+          <button
+            type="button"
+            className="mt-2 text-xs text-emerald-400 hover:text-emerald-300"
+            onClick={() => navigator.clipboard?.writeText(badgeSnippet)}
+          >
+            Copy badge code
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
 
   if (viewId === 'summary') {
     const creative = nightShiftLog.filter((e) => e.message.startsWith('Creative') || e.message.startsWith('Vibe-Sync')).length;
@@ -991,32 +1101,176 @@ function MorningReportModal({ nightShiftLog, onClose }) {
   );
 }
 
-// Social script generator from aura_night_shift logs (Content & Commerce Engine)
+// Empire: Blueprint Store modal — 3 Prime templates, 3D hover, One-Click Install
+function BlueprintStoreModal({ isOpen, onClose, primeBlueprints = PRIME_BLUEPRINTS, installedBlueprintId, onInstall }) {
+  if (!isOpen) return null;
+  return (
+    <AnimatePresence>
+      <motion.div className="fixed inset-0 z-[60] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden />
+        <motion.div
+          className="blueprint-store-modal relative max-w-2xl w-full rounded-3xl p-8 deployment-card-glass border border-white/20 shadow-2xl"
+          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Store className="w-10 h-10" style={{ color: '#8b5cf6' }} />
+              <div>
+                <h2 className="text-2xl font-bold text-white/98">Blueprint Store</h2>
+                <p className="text-white/50 text-sm">Prime templates — one-click install</p>
+              </div>
+            </div>
+            <button type="button" onClick={onClose} className="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10" aria-label="Close"><X className="w-6 h-6" /></button>
+          </div>
+          <div className="grid gap-4">
+            {primeBlueprints.map((bp, idx) => {
+              const isInstalled = installedBlueprintId === bp.id;
+              return (
+                <motion.div
+                  key={bp.id}
+                  className="blueprint-card-3d rounded-2xl p-5 border border-white/10 bg-white/5 relative overflow-hidden"
+                  style={{ ['--accent']: bp.accent }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * idx }}
+                  whileHover={{ scale: 1.02, rotateY: 8 }}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white/95">{bp.name}</h3>
+                      <p className="text-sm text-white/60 mt-1">{bp.description}</p>
+                    </div>
+                    <motion.button
+                      type="button"
+                      onClick={() => !isInstalled && onInstall(bp.id)}
+                      disabled={isInstalled}
+                      className={cn(
+                        'px-4 py-2 rounded-xl font-medium text-sm whitespace-nowrap',
+                        isInstalled ? 'bg-white/10 text-white/50 cursor-default' : 'bg-white/15 text-white/90 hover:bg-white/20 border border-white/20'
+                      )}
+                      whileHover={!isInstalled ? { scale: 1.05 } : {}}
+                      whileTap={!isInstalled ? { scale: 0.98 } : {}}
+                    >
+                      {isInstalled ? 'Installed' : 'One-Click Install'}
+                    </motion.button>
+                  </div>
+                  {isInstalled && (
+                    <span className="absolute top-3 right-3 text-xs text-emerald-400/90 font-medium">Active</span>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// Empire: Upgrade to Pro modal (subscription gate CTA)
+function UpgradeProModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+  return (
+    <AnimatePresence>
+      <motion.div className="fixed inset-0 z-[60] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden />
+        <motion.div
+          className="relative max-w-sm w-full rounded-3xl p-8 deployment-card-glass border border-amber-500/30 shadow-2xl"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Crown className="w-10 h-10 text-amber-400" />
+            <h2 className="text-xl font-bold text-white/95">Upgrade to Pro</h2>
+          </div>
+          <p className="text-white/60 text-sm mb-6">Unlock Self-Healing and Content Creator agents, plus priority support and exclusive blueprints.</p>
+          <div className="flex gap-3">
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/20 text-white/80 hover:bg-white/10 text-sm font-medium">Maybe later</button>
+            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-amber-500/30 border border-amber-400/40 text-amber-200 hover:bg-amber-500/40 text-sm font-medium">Upgrade to Pro</button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// Single social script (legacy)
 function generateSocialScript(nightShiftLog) {
+  return generateSocialScripts(nightShiftLog)[0];
+}
+
+// Viral Content Factory: 3 TikTok scripts with hooks from aura_night_shift (ACC)
+function generateSocialScripts(nightShiftLog) {
   const recent = (nightShiftLog || []).slice(-30);
   const ssl = recent.filter((e) => /SSL|Certificate|Self-Heal|Healing|fix|error/i.test(e.message));
-  const seo = recent.filter((e) => /SEO|Scanned|trending/i.test(e.message));
+  const seo = recent.filter((e) => /SEO|Scanned|trending|Trend/i.test(e.message));
   const deploy = recent.filter((e) => /Deploy|Vercel|Sync|build/i.test(e.message));
-  const lines = [];
-  lines.push('Hook (first 3 sec):');
-  if (ssl.length) lines.push('"Our AI fixed a production error while we were asleep. Here\'s the dashboard that did it."');
-  else if (deploy.length) lines.push('"This is the command center that ships our product. One click. Real builds."');
-  else lines.push('"Dominat8 Lab — the AI factory that shows the work. Let me show you what ran last night."');
-  lines.push('');
-  lines.push('Body (TikTok / YouTube / Facebook):');
-  if (ssl.length) lines.push(`Last night our Self-Healing agent ran ${ssl.length} time(s): SSL and certificate checks. No manual intervention. The logs are in the dashboard — everything from "Detecting SSL failure" to "Certificate renewed. Status: OK."`);
-  if (seo.length) lines.push(`Our SEO pulse scanned for trending keywords ${seo.length} time(s). The blueprint updates live.`);
-  if (deploy.length) lines.push(`We had ${deploy.length} deploy/sync event(s). Vercel status, build logs, and the System Vital orb are all in one place.`);
-  if (!ssl.length && !seo.length && !deploy.length && recent.length) lines.push('The night shift log has ' + recent.length + ' entries. Every agent action is stored so we can turn it into content like this.');
-  lines.push('');
-  lines.push('CTA: "Link in bio — dominat8.com for the showroom, dominat8.io for the engine. Hit Hyper-Drive."');
-  lines.push('');
-  lines.push('Vibe: Obsidian theme, dark glass UI. Music: minimal tech / ambient.');
-  return lines.join('\n');
+  const hooks = [
+    'How I built an AI that fixes itself while I sleep.',
+    'Our dashboard just fixed a production error at 3am. No coffee needed.',
+    'The command center that ships while you sleep — here\'s what ran last night.',
+  ];
+  const bodies = [];
+  if (ssl.length) bodies.push(`Our Self-Healing agent ran ${ssl.length} time(s) last night. SSL and cert checks, zero manual intervention. The logs are right there in the dashboard.`);
+  if (seo.length) bodies.push(`SEO Autopilot scanned for trending keywords ${seo.length} time(s). Meta tags and headers update live.`);
+  if (deploy.length) bodies.push(`We had ${deploy.length} deploy/sync event(s). Vercel status, build logs, System Vital orb — one place.`);
+  if (!bodies.length && recent.length) bodies.push(`The night shift log has ${recent.length} entries. Every agent action turns into content like this.`);
+  const cta = 'CTA: "Link in bio — dominat8.com showroom, dominat8.io engine. Hit Hyper-Drive."';
+  const vibe = 'Vibe: Obsidian / glass UI. Audio: minimal tech or trending "productivity build" sound.';
+  return hooks.map((hook, i) => {
+    const body = bodies[i % bodies.length] || bodies[0] || 'Dominat8 Lab — the AI factory that shows the work.';
+    return `Hook (first 3 sec):\n"${hook}"\n\nBody:\n${body}\n\n${cta}\n\n${vibe}`;
+  });
+}
+
+// Empire: Growth Heartbeat — SEO + Traffic from agent logs (Pulse Analytics)
+function GrowthHeartbeat({ nightShiftLog = [], seoHealth = {} }) {
+  const recent = (nightShiftLog || []).slice(-50);
+  const seoCount = recent.filter((e) => /SEO|Scanned|trending|Trend|keyword/i.test(e.message)).length;
+  const trafficCount = recent.filter((e) => /Deploy|Vercel|Sync|build|Marketing|traffic/i.test(e.message)).length;
+  const maxVal = Math.max(seoCount, trafficCount, 1);
+  const seoPct = Math.min(100, (seoCount / maxVal) * 100);
+  const trafficPct = Math.min(100, (trafficCount / maxVal) * 100);
+  const score = seoHealth.score ?? 85;
+  return (
+    <motion.div
+      className="growth-heartbeat rounded-2xl p-4 border border-white/10 bg-white/5 mb-4"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <TrendingUp className="w-5 h-5 text-emerald-400/90" />
+        <span className="text-sm font-semibold text-white/90">Growth Heartbeat</span>
+      </div>
+      <div className="space-y-2 text-xs">
+        <div>
+          <div className="flex justify-between text-white/60 mb-0.5">SEO (from logs)</div>
+          <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <motion.div className="h-full rounded-full bg-emerald-500/80" initial={{ width: 0 }} animate={{ width: `${seoPct}%` }} transition={{ duration: 0.6 }} />
+          </div>
+          <span className="text-white/50">{seoCount} events</span>
+        </div>
+        <div>
+          <div className="flex justify-between text-white/60 mb-0.5">Traffic / Deploy</div>
+          <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <motion.div className="h-full rounded-full bg-blue-500/80" initial={{ width: 0 }} animate={{ width: `${trafficPct}%` }} transition={{ duration: 0.6, delay: 0.1 }} />
+          </div>
+          <span className="text-white/50">{trafficCount} events</span>
+        </div>
+        <div className="pt-1 text-white/50">SEO Score: <span className="text-white/80 font-medium">{score}</span></div>
+      </div>
+    </motion.div>
+  );
 }
 
 // Agency Intelligence sidebar: Live workstations + Content Creator (Content & Commerce Engine)
-function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, activeAgentLead, isOpen, onClose }) {
+function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, activeAgentLead, isOpen, onClose, seoHealth, isPro, onUpgradePro }) {
   const [generatedScript, setGeneratedScript] = useState(null);
   const creativeTasks = nightShiftLog.filter((e) => e.message.startsWith('Creative') || e.message.startsWith('Vibe-Sync')).slice(-5).reverse();
   const leadDevTasks = nightShiftLog.filter((e) => e.message.startsWith('Lead Dev')).slice(-5).reverse();
@@ -1052,12 +1306,23 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
                 <h2 className="text-lg font-semibold text-white/95 flex items-center gap-2">
                   <Sparkles className="w-5 h-5" style={{ color: '#8b5cf6' }} />
                   Social Lab
+                  {isPro === false && (
+                    <span className="pro-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                      <Crown className="w-3 h-3" /> Pro
+                    </span>
+                  )}
                 </h2>
                 <p className="text-xs text-white/50 mt-0.5">TikTok &amp; Facebook scripts from aura_night_shift</p>
+                {isPro === false && onUpgradePro && (
+                  <button type="button" onClick={onUpgradePro} className="mt-2 text-xs text-amber-400 hover:text-amber-300 font-medium">
+                    Upgrade to Pro →
+                  </button>
+                )}
               </div>
               <button type="button" onClick={onClose} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10" aria-label="Close sidebar"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-4 space-y-6">
+              <GrowthHeartbeat nightShiftLog={nightShiftLog} seoHealth={seoHealth} />
               {workstations.map((ws, idx) => {
                 const isWorking = idx === activeAgentLead;
                 return (
@@ -1091,7 +1356,7 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
                 );
               })}
 
-              {/* Content Creator panel: Generate Social Post from agent logs (Content & Commerce Engine) */}
+              {/* Content Creator: 3 TikTok scripts from night_shift (ACC Viral Sidebar) — Empire: Pro badge */}
               <motion.div
                 className="workstation rounded-2xl p-4 border border-white/10 bg-white/5"
                 initial={{ opacity: 0, y: 12 }}
@@ -1101,24 +1366,29 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
                 <div className="flex items-center gap-2 mb-3">
                   <FileText className="w-5 h-5 text-amber-400" />
                   <span className="font-semibold text-white/90">Content Creator</span>
+                  {isPro === false && (
+                    <span className="pro-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                      <Crown className="w-3 h-3" /> Pro
+                    </span>
+                  )}
                 </div>
-                <p className="text-white/50 text-xs mb-3">Scripts for TikTok, Facebook, YouTube from your latest agent logs (aura_night_shift).</p>
+                <p className="text-white/50 text-xs mb-3">Ready-to-post TikTok scripts from aura_night_shift. Hooks like &quot;How I built an AI that fixes itself while I sleep.&quot;</p>
                 <motion.button
                   type="button"
-                  onClick={() => setGeneratedScript(generateSocialScript(nightShiftLog))}
+                  onClick={() => setGeneratedScript(generateSocialScripts(nightShiftLog).join('\n\n———\n\n'))}
                   className="w-full py-2.5 rounded-xl font-medium bg-amber-500/20 border border-amber-400/40 text-amber-200 hover:bg-amber-500/30 transition-colors"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 >
-                  Generate Social Post
+                  Generate 3 TikTok Scripts
                 </motion.button>
                 {generatedScript && (
                   <textarea
                     readOnly
-                    className="mt-3 w-full h-40 rounded-xl bg-black/30 border border-white/10 text-white/80 text-xs p-3 resize-none font-mono"
+                    className="mt-3 w-full h-48 rounded-xl bg-black/30 border border-white/10 text-white/80 text-xs p-3 resize-none font-mono"
                     value={generatedScript}
-                    aria-label="Generated script"
+                    aria-label="Generated scripts"
                   />
                 )}
               </motion.div>
@@ -1338,31 +1608,54 @@ function FullScreenSetup({ deployment, onClose, closing, focusModeProgress, onbo
 const AURA_MORNING_REPORT_DISMISSED_KEY = 'aura_morning_report_dismissed';
 const ONBOARDING_MODAL_DISMISSED_KEY = 'dominat8_onboarding_dismissed';
 
-// 3-Step Launch onboarding modal (Content & Commerce Engine) – glass panel for New deployments
+// Domain Setup onboarding modal (ACC): high-end portal, DNS Verification progress, Scanning animation
 const LAUNCH_STEPS = ['DNS Mapping', 'SSL Security', 'Engine Launch'];
+const PROGRESS_LABELS = ['DNS Verification', 'SSL Security', 'Engine Launch'];
 function OnboardingModal({ isOpen, onClose, onLaunch }) {
   const [step, setStep] = useState(0);
   return (
     <AnimatePresence>
       {isOpen && (
       <motion.div
-        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
         <motion.div
-          className="onboarding-panel relative max-w-md w-full rounded-2xl p-8 border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl"
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          className="onboarding-panel domain-setup-portal relative max-w-md w-full rounded-2xl p-8 border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl"
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-xl font-semibold text-white/95 mb-1">3-Step Launch</h2>
+          <h2 className="text-xl font-semibold text-white/95 mb-1">Domain Setup</h2>
           <p className="text-white/60 text-sm mb-6">Get your new build live with DNS, SSL, and engine verification.</p>
-          <div className="flex gap-2 mb-6">
+          {step === 0 && (
+            <motion.div
+              className="flex items-center gap-2 text-blue-300 text-sm mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.span animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 1.2, repeat: Infinity }}>
+                Scanning...
+              </motion.span>
+              <span className="flex gap-1">
+                {[0, 1, 2].map((i) => (
+                  <motion.span
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-blue-400"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                  />
+                ))}
+              </span>
+            </motion.div>
+          )}
+          <div className="flex gap-2 mb-4">
             {LAUNCH_STEPS.map((label, i) => (
               <span
                 key={label}
@@ -1375,6 +1668,7 @@ function OnboardingModal({ isOpen, onClose, onLaunch }) {
               </span>
             ))}
           </div>
+          <div className="mb-1 text-xs text-white/50">{PROGRESS_LABELS[step]}</div>
           <div className="h-2 rounded-full bg-white/10 overflow-hidden mb-6">
             <motion.div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500" initial={{ width: 0 }} animate={{ width: `${((step + 1) / LAUNCH_STEPS.length) * 100}%` }} transition={{ duration: 0.4 }} />
           </div>
@@ -1519,6 +1813,12 @@ function App() {
   const agencyLeadRef = useRef(0);
   const [logoHeartbeat, setLogoHeartbeat] = useState(0);
   const [auraMouse, setAuraMouse] = useState({ x: 0.5, y: 0.5 });
+  // Empire Expansion: Revenue, Blueprint Store, Pro gate
+  const [referralCode] = useState('dashboard');
+  const [showBlueprintStore, setShowBlueprintStore] = useState(false);
+  const [installedBlueprintId, setInstalledBlueprintId] = useState(null);
+  const [isPro] = useState(false);
+  const [showUpgradeProModal, setShowUpgradeProModal] = useState(false);
 
   // Rendering Stress Test: ?stress=N renders N 3D cards + FPS meter (max 100)
   const [stressCount] = useState(() => getStressCount());
@@ -1782,13 +2082,52 @@ function App() {
     fetch(`/api/vercel-logs?deploymentId=${encodeURIComponent(errorDeploy.vercelId)}`)
       .then((r) => r.json())
       .then((data) => {
-        if (!cancelled && data.logs != null) setVercelBuildLogs(data.logs);
+        if (!cancelled && data.logs != null) {
+          setVercelBuildLogs(data.logs);
+          appendNightLog('Lead Dev: Analyzing Vercel build logs for repair.');
+        }
       })
       .catch(() => {
         if (!cancelled) setVercelBuildLogs('Could not load build logs.');
       });
     return () => { cancelled = true; };
-  }, [deploymentStatus, deployments]);
+  }, [deploymentStatus, deployments, appendNightLog]);
+
+  // Self-Healing Vercel Bridge: when real build logs arrive, show in terminal and put UI in repair mode (once per log load)
+  const vercelBridgeTriggeredRef = useRef(false);
+  useEffect(() => {
+    if (deploymentStatus !== 'error' || !vercelBuildLogs) {
+      if (deploymentStatus !== 'error') vercelBridgeTriggeredRef.current = false;
+      return;
+    }
+    const errorDeploy = deployments.find((d) => d.status === 'Error');
+    if (!errorDeploy || vercelBridgeTriggeredRef.current) return;
+    vercelBridgeTriggeredRef.current = true;
+    setSelfHealingOn(true);
+    setHealingId(errorDeploy.id);
+    setAgentTypingText(vercelBuildLogs);
+  }, [deploymentStatus, vercelBuildLogs, deployments, setSelfHealingOn, setHealingId, setAgentTypingText]);
+
+  // Simulate error: set deployment to Error + mock logs so you can record Self-Healing TikTok without a real failure
+  const simulateError = useCallback(() => {
+    vercelBridgeTriggeredRef.current = false;
+    setDeploymentStatus('error');
+    setDeployments((prev) => prev.map((d, i) => (i === 0 ? { ...d, status: 'Error' } : d)));
+    setVercelBuildLogs(MOCK_BUILD_LOGS);
+    setActiveAgentLead(1);
+    setAgencyTeam((prev) => ({ ...prev, leadDev: 'working' }));
+    appendNightLog('Lead Dev: Analyzing Vercel build logs for repair.');
+  }, [appendNightLog, setActiveAgentLead, setAgencyTeam]);
+
+  const clearSimulation = useCallback(() => {
+    vercelBridgeTriggeredRef.current = false;
+    setDeploymentStatus('ok');
+    setVercelBuildLogs(null);
+    setDeployments((prev) => prev.map((d) => ({ ...d, status: d.status === 'Error' ? 'ok' : d.status })));
+    setSelfHealingOn(false);
+    setHealingId(null);
+    appendNightLog('Simulation cleared — back to healthy.');
+  }, [appendNightLog, setSelfHealingOn, setHealingId]);
 
   // Trigger onboarding modal when there is a New deployment (Content & Commerce Engine)
   useEffect(() => {
@@ -2026,7 +2365,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     const domain = MIDNIGHT_DOMAINS[cycle % MIDNIGHT_DOMAINS.length];
     const url = domain.url;
 
-    // SEO Pulse: scan for trending keywords, update blueprint state
+    // SEO Autopilot: Trend Scan every 60s — update meta/headers data (high-performing keywords)
     const count = 1 + Math.floor(Math.random() * 3);
     const keywords = [];
     const pool = [...TRENDING_KEYWORDS_POOL];
@@ -2039,7 +2378,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       lastScan: new Date().toISOString(),
       score: Math.min(99, Math.max(70, prev.score + (Math.random() > 0.5 ? 1 : -1))),
     }));
-    appendNightLog(`Scanned '${url}' - Found ${count} SEO keyword opportunities.`);
+    appendNightLog(`Trend Scan: '${url}' — ${count} high-performing keyword(s) added to site-data.`);
 
     // Vibe-Sync: log blueprint update for current theme (Vibe Engine stays active)
     const themeLabel = vibe === 'obsidian' ? 'Obsidian' : 'Cloud';
@@ -2203,6 +2542,18 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     heroDeepGlass: cinematicFocus || vibe === 'obsidian',
     deploymentStatus,
     vercelBuildLogs,
+    referralCode,
+    showBlueprintStore,
+    setShowBlueprintStore,
+    installedBlueprintId,
+    setInstalledBlueprintId,
+    isPro,
+    setShowUpgradeProModal,
+    showUpgradeProModal,
+    appendNightLog,
+    setActiveAgentLead,
+    nightShiftLog,
+    seoHealth,
   };
 
   // Navigation: when activeView is not "deploy", show Hero + view panel + dock instead of full dashboard
@@ -2340,11 +2691,14 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           disabled={vercelSyncLoading}
           className={cn(
             'vercel-status-pill flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium cursor-pointer border-none',
-            deployments.some((d) => d.status === 'Error')
+            deploymentStatus === 'error'
               ? 'vercel-status-failed'
+              : deploymentStatus === 'ok'
+              ? 'vercel-status-active'
               : 'vercel-status-active'
           )}
-          title="Click to sync live Vercel build status"
+          title={vercelSyncLoading ? 'Syncing…' : `Vercel status: ${deploymentStatus === 'ok' ? 'healthy' : deploymentStatus === 'error' ? 'error' : 'unknown'}. Click to sync.`}
+          aria-label={vercelSyncLoading ? 'Syncing Vercel status' : `Vercel status: ${deploymentStatus === 'ok' ? 'healthy' : deploymentStatus === 'error' ? 'error' : 'unknown'}`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
@@ -2359,9 +2713,46 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          title={!isPro ? 'Self-Healing (Pro) — Upgrade to Pro for full access' : 'Toggle Self-Healing'}
         >
-          Self-Healing
+          <span className="flex items-center gap-1.5">
+            Self-Healing
+            {!isPro && <Crown className="w-3.5 h-3.5 text-amber-400/90" />}
+          </span>
         </motion.button>
+        {!isPro && (
+          <button
+            type="button"
+            onClick={() => setShowUpgradeProModal(true)}
+            className="text-xs text-amber-400/90 hover:text-amber-300 font-medium px-1"
+            title="Upgrade to Pro"
+          >
+            Upgrade to Pro
+          </button>
+        )}
+        {deploymentStatus === 'error' ? (
+          <motion.button
+            type="button"
+            onClick={clearSimulation}
+            className="builder-toggle text-xs text-white/80 hover:text-white border border-white/20"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            title="Clear simulated error and restore healthy state"
+          >
+            Clear simulation
+          </motion.button>
+        ) : (
+          <motion.button
+            type="button"
+            onClick={simulateError}
+            className="builder-toggle text-xs text-white/70 hover:text-white/90"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            title="Simulate Vercel error + mock logs for recording Self-Healing TikTok"
+          >
+            Simulate error
+          </motion.button>
+        )}
         <motion.button
           type="button"
           onClick={() => {
@@ -2374,6 +2765,33 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         >
           {themeConfig.vibe === 'custom' ? 'Custom' : vibe === 'obsidian' ? 'Obsidian' : 'Cloud'}
+        </motion.button>
+        <motion.button
+          type="button"
+          onClick={() => {
+            setActiveAgentLead(0);
+            appendNightLog('Creative Director: Global Launch — suggested translated meta-tags and headers for EN, ES, FR, DE, PT, JA, ZH, KO, AR, HI. Ready for multi-language rollout.');
+          }}
+          className="builder-toggle flex items-center gap-1.5"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          title="Trigger Creative Director to suggest translated meta-tags (10 languages)"
+        >
+          <Languages className="w-4 h-4" />
+          Global Launch
+        </motion.button>
+        <motion.button
+          type="button"
+          onClick={() => setShowBlueprintStore(true)}
+          className="builder-toggle flex items-center gap-1.5"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          title="Blueprint Store — Prime templates"
+        >
+          <Store className="w-4 h-4" />
+          Blueprint Store
         </motion.button>
         <motion.button
           type="button"
@@ -2496,6 +2914,22 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         }}
       />
 
+      {/* Empire: Blueprint Store modal */}
+      <BlueprintStoreModal
+        isOpen={showBlueprintStore}
+        onClose={() => setShowBlueprintStore(false)}
+        primeBlueprints={PRIME_BLUEPRINTS}
+        installedBlueprintId={installedBlueprintId}
+        onInstall={(id) => {
+          setInstalledBlueprintId(id);
+          const bp = PRIME_BLUEPRINTS.find((b) => b.id === id);
+          appendNightLog(bp ? `Blueprint "${bp.name}" installed. Site look upgraded.` : `Blueprint ${id} installed.`);
+        }}
+      />
+
+      {/* Empire: Upgrade to Pro CTA modal */}
+      <UpgradeProModal isOpen={showUpgradeProModal} onClose={() => setShowUpgradeProModal(false)} />
+
       {/* Agency Intelligence sidebar */}
       <AgencyIntelligenceSidebar
         nightShiftLog={nightShiftLog}
@@ -2503,6 +2937,9 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         activeAgentLead={activeAgentLead}
         isOpen={showAgencySidebar}
         onClose={() => setShowAgencySidebar(false)}
+        seoHealth={seoHealth}
+        isPro={isPro}
+        onUpgradePro={() => setShowUpgradeProModal(true)}
       />
 
       {/* Self-Healing Ticket panel */}
