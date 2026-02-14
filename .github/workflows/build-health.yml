@@ -1,0 +1,31 @@
+# Full health loop: verify Dominat8 dashboard build on every push/PR.
+# No secrets required. Use with Vercel Git integration for auto-deploy on push to main.
+name: Build Health
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: ai-command-center/package-lock.json
+
+      - name: Vercel build (ai-command-center → build/)
+        run: npm run vercel-build
+        working-directory: .
+
+      - name: Verify build output
+        run: |
+          test -f build/index.html || (echo "Missing build/index.html" && exit 1)
+          echo "Build output OK"
