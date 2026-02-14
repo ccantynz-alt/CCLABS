@@ -1,5 +1,5 @@
 {
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "build",
-  "rewrites": [{ "source": "/((?!static/).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!static/)(?!api/).*)", "destination": "/index.html" }]
 }
