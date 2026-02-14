@@ -1,58 +1,35 @@
-# CCLABS
+# CCLABS - AI Website Builder
 
-Welcome to CCLABS repository!
+An AI-powered website builder built with Next.js, React, and TypeScript.
 
-## Cursor Integration
+## Getting Started
 
-This repository is configured to work seamlessly with [Cursor](https://cursor.com/), an AI-powered code editor.
+First, install the dependencies:
 
-### Getting Started with Cursor
+```bash
+npm install
+```
 
-1. **Download Cursor**: Visit [cursor.com](https://cursor.com/) to download the editor
-2. **Open this repository**: Use Cursor to open this project folder
-3. **AI-Powered Coding**: Cursor will automatically use the configuration files in this repository
+Then, run the development server:
 
-### Configuration Files
+```bash
+npm run dev
+```
 
-- **`.cursorrules`**: Contains project-specific guidelines and rules for Cursor's AI assistant
-- **`.cursorignore`**: Specifies files and directories that should be excluded from Cursor's indexing
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Features
+## Features
 
-When using Cursor with this repository, you get:
+- AI-powered website generation
+- Modern React with Next.js 15
+- TypeScript support
+- Responsive design
 
-- **Intelligent Code Completion**: AI-powered suggestions based on your codebase
-- **Context-Aware Assistance**: The AI understands your project structure and conventions
-- **Code Generation**: Generate code snippets and boilerplate
-- **Debugging Help**: Get AI assistance with troubleshooting and debugging
-- **Documentation**: Automatic documentation generation and explanations
+## Deployment
 
-### Workflow Integration
+This project is optimized for deployment on Vercel. Simply push to your repository and Vercel will automatically deploy.
 
-Cursor integrates with your existing Git workflow and respects all `.gitignore` settings. The `.cursorignore` file provides additional control over which files are indexed for AI context.
+## Learn More
 
-### Customization
-
-You can customize the AI behavior by editing the `.cursorrules` file. Add project-specific guidelines, coding standards, or any instructions you want Cursor to follow.
-
-## Development
-
-This repository uses GitHub Actions for CI/CD. See `.github/workflows/` for workflow configurations.
-
-## Contributing
-
-When contributing to this repository:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test your changes
-5. Submit a pull request
-
-## License
-
-Please refer to the LICENSE file for licensing information.
-
----
-
-**Happy coding with Cursor!** 🚀
+- [Next.js Documentation](https://nextjs.org/docs)
+- [React Documentation](https://react.dev/)
