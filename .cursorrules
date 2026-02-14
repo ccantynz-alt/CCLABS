@@ -3,6 +3,13 @@
 ## Project Overview
 This is the CCLABS repository. When working in this codebase, please follow these guidelines:
 
+## Dominat8 / ai-command-center — Linear Single-Source Model
+For the **ai-command-center** app (Nexus visuals, Autonomous Command, Empire Expansion, Content Creator):
+
+- **One File Rule:** Apply all changes to **App.js only. No branching.** Do not create new component files or split code into separate modules; keep the single-source layout so Vercel deployments stay clean and predictable.
+- **Index before big scripts:** The user may type **@App.js** in Composer before a large change so the AI has the latest version of the code. Assume App.js is the source of truth for this app.
+- **Checkpoints:** After major scripts, the user will Accept All, verify the design, and Commit to GitHub. Treat each such commit as a checkpoint; avoid suggesting refactors that would undo or conflict with that checkpoint without good reason.
+
 ## Code Style and Standards
 - Write clean, maintainable, and well-documented code
 - Follow standard coding conventions for the language being used

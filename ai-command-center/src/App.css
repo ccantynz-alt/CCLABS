@@ -799,6 +799,38 @@
   height: 0.5rem;
 }
 
+/* Viral Growth: Nexus glass-morphism + 3D bloom for modals */
+.nexus-modal-bloom {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(139, 92, 246, 0.08),
+    0 0 120px rgba(59, 130, 246, 0.05);
+}
+.upgrade-pro-modal.nexus-modal-bloom {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 24px 48px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(251, 191, 36, 0.12),
+    0 0 100px rgba(245, 158, 11, 0.06);
+}
+
+/* Elite Operations: Tenant Shield — Matrix-style scanlines when Client View active */
+.tenant-shield-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 100, 0.03) 2px,
+    rgba(0, 255, 100, 0.03) 4px
+  );
+  animation: tenant-shield-scan 8s linear infinite;
+}
+@keyframes tenant-shield-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
 /* Self-Healing Ticket panel */
 .ticket-panel {
   position: fixed;

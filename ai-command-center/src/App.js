@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown } from 'lucide-react';
+import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown, Megaphone, MessageCircle, User, BookOpen, Target, Zap, Shield, Sliders } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
 
@@ -188,13 +188,17 @@ const PRIME_BLUEPRINTS = [
 
 const DOCK_ITEMS = [
   { id: 'deploy', label: 'Deploy', Icon: Rocket, color: '#22c55e' },
+  { id: 'leads', label: 'Lead Magnet', Icon: Target, color: '#a855f7' },
   { id: 'revenue', label: 'Revenue', Icon: DollarSign, color: '#10b981' },
+  { id: 'marketing', label: 'Marketing', Icon: Megaphone, color: '#f59e0b' },
   { id: 'domains', label: 'Domains', Icon: Globe, color: '#3b82f6' },
   { id: 'ssl', label: 'SSL', Icon: Lock, color: '#eab308' },
   { id: 'monitor', label: 'Monitor', Icon: Monitor, color: '#a855f7' },
   { id: 'fix', label: 'Fix', Icon: Wrench, color: '#f97316' },
   { id: 'automate', label: 'Automate', Icon: Sparkles, color: '#ec4899' },
   { id: 'settings', label: 'Settings', Icon: Settings, color: '#94a3b8' },
+  { id: 'case-studies', label: 'Case Studies', Icon: BookOpen, color: '#06b6d4' },
+  { id: 'feature-control', label: 'Feature Control', Icon: Sliders, color: '#64748b' },
   { id: 'summary', label: 'Nightly Summary', Icon: FileText, color: '#8b5cf6' },
 ];
 
@@ -284,7 +288,8 @@ function ProgressBar({ progress, color, taskColor }) {
 }
 
 // Luxury Hero Showroom (.com): Cloud theme, pulsing 8, Hyper-Drive CTA — subtle 3D tilt (Nexus language)
-function ShowroomView({ onLaunchLab }) {
+// Intelligence Suite: Stealth Blog — Autonomous Blog section (Creative Director posts from Self-Healing wins)
+function ShowroomView({ onLaunchLab, autonomousBlogPosts = [] }) {
   const [hyperdriving, setHyperdriving] = useState(false);
   const panelRef = useRef(null);
   const mouseX = useMotionValue(0.5);
@@ -314,9 +319,10 @@ function ShowroomView({ onLaunchLab }) {
     }
     setTimeout(() => onLaunchLab?.(), 1200);
   };
+  const latestPosts = autonomousBlogPosts.slice(-3).reverse();
   return (
     <motion.div
-      className="showroom-bg fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
+      className="showroom-bg fixed inset-0 flex flex-col items-center overflow-y-auto overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -324,7 +330,7 @@ function ShowroomView({ onLaunchLab }) {
       <div className="showroom-gradient" aria-hidden />
       <motion.div
         ref={panelRef}
-        className="showroom-content showroom-content-3d relative z-10 flex flex-col items-center justify-center text-center px-6"
+        className="showroom-content showroom-content-3d relative z-10 flex flex-col items-center justify-center text-center px-6 min-h-[70vh]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
@@ -361,6 +367,35 @@ function ShowroomView({ onLaunchLab }) {
           )}
         </motion.button>
       </motion.div>
+
+      {/* Autonomous Blog — Stealth SEO: posts from Creative Director / Self-Healing wins */}
+      {latestPosts.length > 0 && (
+        <motion.section
+          className="showroom-blog w-full max-w-2xl px-6 pb-24 pt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          <h2 className="text-xl font-semibold text-white/90 flex items-center gap-2 mb-4">
+            <BookOpen className="w-5 h-5 text-white/60" />
+            Autonomous Blog
+          </h2>
+          <p className="text-white/50 text-sm mb-6">How we keep your sites live. Generated from Self-Healing wins.</p>
+          <div className="space-y-4">
+            {latestPosts.map((post) => (
+              <article
+                key={post.id}
+                className="rounded-2xl p-5 border border-white/10 bg-white/5 text-left"
+              >
+                <time className="text-white/40 text-xs" dateTime={post.date}>{post.date}</time>
+                <h3 className="text-lg font-semibold text-white/95 mt-1">{post.title}</h3>
+                <p className="text-white/70 text-sm mt-2">{post.body}</p>
+              </article>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
       <AnimatePresence>
         {hyperdriving && (
           <motion.div
@@ -425,7 +460,7 @@ function TeamStatusWidget({ agencyTeam = {}, activeAgentLead }) {
 // ─── Block components (Live Blueprint drives these) ───
 // Aura AI Command Input: "Creative Director, go Darker" -> instant UI update (Production Engine)
 function HeroBlock({ props: blockProps = {}, context }) {
-  const placeholder = blockProps.placeholder || 'Talk to your Agency — e.g. Creative Director, go Darker';
+  const placeholder = context?.conciergeOverrides?.heroPlaceholder ?? blockProps.placeholder ?? 'Talk to your Agency — e.g. Creative Director, go Darker';
   const onVibeFromImage = context?.onVibeFromImage;
   const onVoiceVibe = context?.onVoiceVibe;
   const onAuraCommand = context?.onAuraCommand;
@@ -873,15 +908,281 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
   );
 }
 
+// Viral Growth: Lead Magnet — simulates social scan ("AI Website Builder", "Lovable alternative"), Draft Site notifications
+const SOCIAL_TREND_SOURCES = [
+  { keyword: 'AI Website Builder', handle: '@buildwithai' },
+  { keyword: 'Lovable alternative', handle: '@nocode_seeker' },
+  { keyword: 'AI site builder', handle: '@startupfounder' },
+];
+function LeadMagnetPanelBlock({ draftLeads = [], onScan, onCreateInvite }) {
+  return (
+    <motion.div
+      className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <span style={{ color: '#a855f7' }}>
+          <Target className="w-8 h-8" />
+        </span>
+        <h2 className="text-xl font-semibold text-white/95">Lead Magnet</h2>
+      </div>
+      <p className="text-white/60 text-sm mb-4">Monitors social mentions of &quot;AI Website Builder&quot; and &quot;Lovable alternative&quot;. Draft builds are created in the background; Creative Director sends a personalized invite.</p>
+      <motion.button
+        type="button"
+        onClick={onScan}
+        className="mb-6 px-4 py-2 rounded-xl bg-violet-500/25 border border-violet-400/40 text-violet-200 hover:bg-violet-500/35 text-sm font-medium flex items-center gap-2"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Zap className="w-4 h-4" />
+        Scan social trends now
+      </motion.button>
+      <div className="text-white/50 text-xs uppercase tracking-wider mb-3">Draft Site notifications</div>
+      <div className="space-y-3 max-h-72 overflow-y-auto">
+        {draftLeads.length === 0 ? (
+          <p className="text-white/40 text-sm italic">No draft builds yet. Run a scan to simulate new leads.</p>
+        ) : (
+          draftLeads.map((lead) => (
+            <div
+              key={lead.id}
+              className="rounded-xl p-4 border border-white/10 bg-white/5 flex items-center justify-between gap-3"
+            >
+              <div>
+                <p className="text-white/90 font-medium text-sm">{lead.handle} — {lead.source}</p>
+                <p className="text-white/50 text-xs mt-0.5">Draft: {lead.suggestedSite}</p>
+              </div>
+              {!lead.invited ? (
+                <button
+                  type="button"
+                  onClick={() => onCreateInvite(lead)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/30 border border-violet-400/40 text-violet-200 hover:bg-violet-500/50"
+                >
+                  Create invite
+                </button>
+              ) : (
+                <span className="text-emerald-400/90 text-xs font-medium">Invite sent</span>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// Intelligence Suite: Autonomous Ad Architect — FB/Google ad copy from Pulse (Marketing tab)
+function MarketingPanelBlock({ nightShiftLog = [], seoHealth = {} }) {
+  const [generatedAds, setGeneratedAds] = useState(null);
+  const recent = (nightShiftLog || []).slice(-40);
+  const trafficEvents = recent.filter((e) => /Deploy|Vercel|Marketing|traffic/i.test(e.message)).length;
+  const score = seoHealth.score ?? 85;
+  const keywords = (seoHealth.keywords || []).slice(0, 5).join(', ') || 'AI, automation, uptime';
+  const generateAds = () => {
+    const fbHeadline = `We just hit ${score} SEO score and ${trafficEvents} deploy events this week.`;
+    const fbBody = `Dominat8 runs your site on autopilot. Self-healing, SEO, and analytics — no manual work. Keywords: ${keywords}.`;
+    const googleHeadline = `Dominat8 Lab | ${score} SEO · Self-Healing Sites`;
+    const googleDesc = `Sites that fix themselves. ${trafficEvents} automated events. Trending: ${keywords}. Join the AI factory.`;
+    setGeneratedAds({ fb: { headline: fbHeadline, body: fbBody }, google: { headline: googleHeadline, desc: googleDesc } });
+  };
+  return (
+    <motion.div
+      className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <span style={{ color: '#f59e0b' }}>
+          <Megaphone className="w-8 h-8" />
+        </span>
+        <h2 className="text-xl font-semibold text-white/95">Autonomous Ad Architect</h2>
+      </div>
+      <p className="text-white/60 text-sm mb-4">High-conversion ad copy generated from your latest Growth Heartbeat (SEO + Traffic).</p>
+      <button
+        type="button"
+        onClick={generateAds}
+        className="mb-4 px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-200 hover:bg-amber-500/30 text-sm font-medium"
+      >
+        Generate Facebook &amp; Google Ads
+      </button>
+      {generatedAds && (
+        <div className="space-y-4 text-sm">
+          <div className="rounded-xl bg-white/5 p-4 border border-white/10">
+            <div className="text-white/50 text-xs uppercase tracking-wider mb-2">Facebook Ad</div>
+            <p className="font-semibold text-white/90">{generatedAds.fb.headline}</p>
+            <p className="text-white/70 mt-1">{generatedAds.fb.body}</p>
+          </div>
+          <div className="rounded-xl bg-white/5 p-4 border border-white/10">
+            <div className="text-white/50 text-xs uppercase tracking-wider mb-2">Google Ad</div>
+            <p className="font-semibold text-white/90">{generatedAds.google.headline}</p>
+            <p className="text-white/70 mt-1">{generatedAds.google.desc}</p>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// Intelligence Suite: Concierge Support Agent — 24/7 widget; Lead Dev applies design changes to JSON
+function ConciergeSupportWidget({ isOpen, onOpen, onClose, onSubmit }) {
+  const [input, setInput] = useState('');
+  const handleSubmit = () => {
+    const t = input.trim();
+    if (!t) return;
+    onSubmit(t);
+    setInput('');
+    onClose();
+  };
+  return (
+    <>
+      {!isOpen && (
+        <motion.button
+          type="button"
+          onClick={onOpen}
+          className="concierge-fab fixed bottom-20 right-6 z-30 flex items-center justify-center w-14 h-14 rounded-full bg-violet-500/90 border border-white/20 shadow-lg text-white hover:bg-violet-500"
+          aria-label="Open Support"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <MessageCircle className="w-6 h-6" />
+        </motion.button>
+      )}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div className="fixed inset-0 z-40 bg-black/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} aria-hidden />
+            <motion.div
+              className="concierge-panel fixed bottom-20 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] rounded-2xl p-4 deployment-card-glass border border-white/20 shadow-2xl"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="flex items-center gap-2 text-white/95 font-semibold">
+                  <MessageCircle className="w-5 h-5 text-violet-400" />
+                  Concierge Support
+                </span>
+                <button type="button" onClick={onClose} className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10" aria-label="Close"><X className="w-5 h-5" /></button>
+              </div>
+              <p className="text-white/50 text-xs mb-3">Ask for design changes. Lead Dev will apply them to the JSON.</p>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="e.g. Change hero title to Welcome"
+                className="w-full h-24 rounded-xl bg-black/30 border border-white/10 text-white/90 text-sm p-3 resize-none placeholder:text-white/40"
+                aria-label="Support request"
+              />
+              <motion.button
+                type="button"
+                onClick={handleSubmit}
+                className="w-full mt-2 py-2.5 rounded-xl font-medium bg-violet-500/30 border border-violet-400/40 text-white hover:bg-violet-500/50"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+              >
+                Send — Lead Dev will apply
+              </motion.button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+// Elite Operations: Ghost Copywriter — convert Uptime/Self-Heal logs into Success Stories
+function CaseStudiesPanelBlock({ nightShiftLog = [], onGenerateSuccessStory }) {
+  const [generatedStory, setGeneratedStory] = useState(null);
+  const generate = () => {
+    const healing = nightShiftLog.filter((e) => /Self-Heal|SSL|Certificate|repair|Lead Dev|fix applied/i.test(e.message));
+    const seo = nightShiftLog.filter((e) => /SEO|Scanned|keyword|Trend/i.test(e.message));
+    const url = healing[0]?.message?.match(/'([^']+)'/)?.[1] || 'your-site.com';
+    const title = `How We Kept ${url} at 99.9% Uptime`;
+    const body = `${healing.length} self-healing event(s) and ${seo.length} SEO optimization(s) in the last cycle. Zero manual intervention. Our Lead Dev and Creative Director agents detected issues and applied fixes before users noticed.`;
+    setGeneratedStory({ title, body, metrics: { uptime: '99.9%', selfHealEvents: healing.length, seoUpdates: seo.length } });
+    onGenerateSuccessStory?.({ title, body });
+  };
+  return (
+    <motion.div
+      className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <span style={{ color: '#06b6d4' }}><BookOpen className="w-8 h-8" /></span>
+        <h2 className="text-xl font-semibold text-white/95">Ghost Copywriter</h2>
+      </div>
+      <p className="text-white/60 text-sm mb-4">Turns Self-Healing and uptime logs into professional Success Stories for the .com Showroom.</p>
+      <button type="button" onClick={generate} className="mb-6 px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 hover:bg-cyan-500/30 text-sm font-medium">Generate Success Story</button>
+      {generatedStory && (
+        <div className="rounded-xl p-5 border border-white/10 bg-white/5 space-y-3">
+          <h3 className="text-lg font-semibold text-white/90">{generatedStory.title}</h3>
+          <p className="text-white/70 text-sm">{generatedStory.body}</p>
+          <div className="flex gap-4 text-xs text-white/50">
+            <span>Uptime: {generatedStory.metrics.uptime}</span>
+            <span>Self-Heal: {generatedStory.metrics.selfHealEvents}</span>
+            <span>SEO: {generatedStory.metrics.seoUpdates}</span>
+          </div>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// Elite Operations: Feature Control — toggle Social Agent & SEO Autopilot per deployment
+function FeatureControlPanelBlock({ deployments = [], featureFlagsByDeployment = {}, onToggleFeature }) {
+  return (
+    <motion.div
+      className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <span style={{ color: '#64748b' }}><Sliders className="w-8 h-8" /></span>
+        <h2 className="text-xl font-semibold text-white/95">Feature Control</h2>
+      </div>
+      <p className="text-white/60 text-sm mb-4">Turn Social Agent and SEO Autopilot ON or OFF per deployment (subscription-level control).</p>
+      <div className="space-y-4">
+        {deployments.map((d) => {
+          const flags = featureFlagsByDeployment[d.id] ?? { socialAgent: true, seoAutopilot: true };
+          return (
+            <div key={d.id} className="rounded-xl p-4 border border-white/10 bg-white/5">
+              <p className="text-white/90 font-medium text-sm mb-3">{d.url}</p>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+                  <input type="checkbox" checked={!!flags.socialAgent} onChange={() => onToggleFeature?.(d.id, 'socialAgent', !flags.socialAgent)} className="rounded" />
+                  Social Agent
+                </label>
+                <label className="flex items-center gap-2 text-sm text-white/70 cursor-pointer">
+                  <input type="checkbox" checked={!!flags.seoAutopilot} onChange={() => onToggleFeature?.(d.id, 'seoAutopilot', !flags.seoAutopilot)} className="rounded" />
+                  SEO Autopilot
+                </label>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
 // View panel shown when a dock item other than Deploy is selected (navigation content)
 const VIEW_PANEL_CONFIG = {
+  leads: { label: 'Lead Magnet', description: 'Draft builds from social mentions — AI Website Builder, Lovable alternative.', Icon: Target },
   revenue: { label: 'Revenue', description: 'Affiliate links and referral revenue from Built with Dominat8.', Icon: DollarSign },
+  marketing: { label: 'Marketing', description: 'Autonomous Ad Architect — Facebook & Google ad copy from Pulse.', Icon: Megaphone },
   domains: { label: 'Domains', description: 'Manage custom domains and DNS records.', Icon: Globe },
   ssl: { label: 'SSL', description: 'Certificates and HTTPS status for your deployments.', Icon: Lock },
   monitor: { label: 'Monitor', description: 'Uptime, logs, and performance metrics.', Icon: Monitor },
   fix: { label: 'Fix', description: 'Self-heal and repair deployment issues.', Icon: Wrench },
   automate: { label: 'Automate', description: 'Workflows and automation rules.', Icon: Sparkles },
   settings: { label: 'Settings', description: 'Project and account preferences.', Icon: Settings },
+  'case-studies': { label: 'Case Studies', description: 'Ghost Copywriter — Success Stories from Uptime & Self-Heal logs.', Icon: BookOpen },
+  'feature-control': { label: 'Feature Control', description: 'Toggle Social Agent & SEO Autopilot per deployment.', Icon: Sliders },
   summary: { label: 'Nightly Summary', description: 'Morning Report — value generated by the Agency overnight.', Icon: FileText },
 };
 
@@ -936,11 +1237,46 @@ function ViewPanelBlock({ props: blockProps, context }) {
     );
   }
 
+  if (viewId === 'leads') {
+    return (
+      <LeadMagnetPanelBlock
+        draftLeads={context?.draftLeads || []}
+        onScan={context?.onLeadScan}
+        onCreateInvite={context?.onCreateLeadInvite}
+      />
+    );
+  }
+
+  if (viewId === 'marketing') {
+    return (
+      <MarketingPanelBlock nightShiftLog={nightShiftLog} seoHealth={context?.seoHealth} />
+    );
+  }
+
+  if (viewId === 'case-studies') {
+    return (
+      <CaseStudiesPanelBlock
+        nightShiftLog={nightShiftLog}
+        onGenerateSuccessStory={context?.onGenerateSuccessStory}
+      />
+    );
+  }
+  if (viewId === 'feature-control') {
+    return (
+      <FeatureControlPanelBlock
+        deployments={context?.deployments || []}
+        featureFlagsByDeployment={context?.featureFlagsByDeployment || {}}
+        onToggleFeature={context?.onToggleFeature}
+      />
+    );
+  }
+
   if (viewId === 'summary') {
     const creative = nightShiftLog.filter((e) => e.message.startsWith('Creative') || e.message.startsWith('Vibe-Sync')).length;
     const leadDev = nightShiftLog.filter((e) => e.message.startsWith('Lead Dev')).length;
     const qa = nightShiftLog.filter((e) => e.message.startsWith('QA')).length;
     const marketing = nightShiftLog.filter((e) => e.message.startsWith('Marketing')).length;
+    const retentionHooks = context?.retentionHooks || [];
     return (
       <motion.div
         className="w-full max-w-2xl rounded-2xl p-8 deployment-card-glass border border-white/10 morning-report-panel"
@@ -954,6 +1290,16 @@ function ViewPanelBlock({ props: blockProps, context }) {
           </span>
           <h2 className="text-xl font-semibold text-white/95">Morning Report</h2>
         </div>
+        {retentionHooks.length > 0 && (
+          <div className="rounded-xl p-4 border border-amber-500/30 bg-amber-500/10 mb-6">
+            <div className="text-amber-400/90 text-xs uppercase tracking-wider mb-2">User Pulse — Retention Hooks</div>
+            <ul className="space-y-2">
+              {retentionHooks.map((h) => (
+                <li key={h.id} className="text-sm text-white/90">{h.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <p className="text-white/60 text-sm mb-6">Summary of value generated by the Aura Agency overnight.</p>
         <div className="morning-report-stats grid grid-cols-2 gap-3 mb-6">
           <div className="rounded-xl bg-white/5 px-4 py-3 border border-white/10">
@@ -1176,22 +1522,33 @@ function UpgradeProModal({ isOpen, onClose }) {
   return (
     <AnimatePresence>
       <motion.div className="fixed inset-0 z-[60] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-xl" onClick={onClose} aria-hidden />
         <motion.div
-          className="relative max-w-sm w-full rounded-3xl p-8 deployment-card-glass border border-amber-500/30 shadow-2xl"
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
+          className="upgrade-pro-modal relative max-w-sm w-full rounded-3xl p-8 deployment-card-glass border border-amber-500/30 shadow-2xl nexus-modal-bloom"
+          initial={{ opacity: 0, scale: 0.92, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
         >
           <div className="flex items-center gap-3 mb-4">
-            <Crown className="w-10 h-10 text-amber-400" />
+            <motion.span animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+              <Crown className="w-10 h-10 text-amber-400" />
+            </motion.span>
             <h2 className="text-xl font-bold text-white/95">Upgrade to Pro</h2>
           </div>
-          <p className="text-white/60 text-sm mb-6">Unlock Self-Healing and Content Creator agents, plus priority support and exclusive blueprints.</p>
+          <p className="text-white/60 text-sm mb-6">Unlock Self-Healing, Content Creator, and Vercel Monitor. Priority support and exclusive blueprints.</p>
           <div className="flex gap-3">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-white/20 text-white/80 hover:bg-white/10 text-sm font-medium">Maybe later</button>
-            <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-amber-500/30 border border-amber-400/40 text-amber-200 hover:bg-amber-500/40 text-sm font-medium">Upgrade to Pro</button>
+            <motion.button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 rounded-xl bg-amber-500/30 border border-amber-400/40 text-amber-200 hover:bg-amber-500/40 text-sm font-semibold"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            >
+              Upgrade Now
+            </motion.button>
           </div>
         </motion.div>
       </motion.div>
@@ -1270,7 +1627,7 @@ function GrowthHeartbeat({ nightShiftLog = [], seoHealth = {} }) {
 }
 
 // Agency Intelligence sidebar: Live workstations + Content Creator (Content & Commerce Engine)
-function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, activeAgentLead, isOpen, onClose, seoHealth, isPro, onUpgradePro }) {
+function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, activeAgentLead, isOpen, onClose, seoHealth, isPro, onUpgradePro, onGlobalUpdate }) {
   const [generatedScript, setGeneratedScript] = useState(null);
   const creativeTasks = nightShiftLog.filter((e) => e.message.startsWith('Creative') || e.message.startsWith('Vibe-Sync')).slice(-5).reverse();
   const leadDevTasks = nightShiftLog.filter((e) => e.message.startsWith('Lead Dev')).slice(-5).reverse();
@@ -1322,6 +1679,20 @@ function AgencyIntelligenceSidebar({ nightShiftLog = [], agencyTeam = {}, active
               <button type="button" onClick={onClose} className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/10" aria-label="Close sidebar"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-4 space-y-6">
+              {onGlobalUpdate && (
+                <motion.button
+                  type="button"
+                  onClick={onGlobalUpdate}
+                  className="w-full py-3 rounded-xl font-medium bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 hover:bg-cyan-500/30 flex items-center justify-center gap-2"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  title="Apply Self-Healing patch to all deployments"
+                >
+                  <Zap className="w-5 h-5" />
+                  Global Update (Commander)
+                </motion.button>
+              )}
               <GrowthHeartbeat nightShiftLog={nightShiftLog} seoHealth={seoHealth} />
               {workstations.map((ws, idx) => {
                 const isWorking = idx === activeAgentLead;
@@ -1608,7 +1979,7 @@ function FullScreenSetup({ deployment, onClose, closing, focusModeProgress, onbo
 const AURA_MORNING_REPORT_DISMISSED_KEY = 'aura_morning_report_dismissed';
 const ONBOARDING_MODAL_DISMISSED_KEY = 'dominat8_onboarding_dismissed';
 
-// Domain Setup onboarding modal (ACC): high-end portal, DNS Verification progress, Scanning animation
+// Domain Setup onboarding modal (Viral Growth): Zero-Touch 3-step, futuristic scanning, Nexus glass
 const LAUNCH_STEPS = ['DNS Mapping', 'SSL Security', 'Engine Launch'];
 const PROGRESS_LABELS = ['DNS Verification', 'SSL Security', 'Engine Launch'];
 function OnboardingModal({ isOpen, onClose, onLaunch }) {
@@ -1624,18 +1995,32 @@ function OnboardingModal({ isOpen, onClose, onLaunch }) {
         onClick={onClose}
       >
         <motion.div
-          className="onboarding-panel domain-setup-portal relative max-w-md w-full rounded-2xl p-8 border border-white/20 bg-white/10 shadow-2xl backdrop-blur-xl"
+          className="onboarding-panel domain-setup-portal relative max-w-md w-full rounded-2xl p-8 deployment-card-glass border border-white/20 shadow-2xl nexus-modal-bloom overflow-hidden"
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
           transition={{ type: 'spring', stiffness: 300, damping: 28 }}
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-xl font-semibold text-white/95 mb-1">Domain Setup</h2>
-          <p className="text-white/60 text-sm mb-6">Get your new build live with DNS, SSL, and engine verification.</p>
-          {step === 0 && (
+          {/* Futuristic scanning sweep line */}
+          {(step === 0 || step === 1) && (
             <motion.div
-              className="flex items-center gap-2 text-blue-300 text-sm mb-4"
+              className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"
+              aria-hidden
+            >
+              <motion.div
+                className="absolute left-0 top-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent"
+                animate={{ top: ['0%', '100%'] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              />
+            </motion.div>
+          )}
+          <h2 className="text-xl font-semibold text-white/95 mb-1">Domain Setup</h2>
+          <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Zero-Touch automation</p>
+          <p className="text-white/60 text-sm mb-6">DNS → SSL → Engine Launch. Real-time progress as the AI handles the tech.</p>
+          {(step === 0 || step === 1) && (
+            <motion.div
+              className="flex items-center gap-2 text-cyan-300/90 text-sm mb-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1647,7 +2032,7 @@ function OnboardingModal({ isOpen, onClose, onLaunch }) {
                 {[0, 1, 2].map((i) => (
                   <motion.span
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-blue-400"
+                    className="w-1.5 h-1.5 rounded-full bg-cyan-400"
                     animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
                   />
@@ -1819,6 +2204,31 @@ function App() {
   const [installedBlueprintId, setInstalledBlueprintId] = useState(null);
   const [isPro] = useState(false);
   const [showUpgradeProModal, setShowUpgradeProModal] = useState(false);
+  // Intelligence Suite: Concierge, User View, Stealth Blog
+  const [showConcierge, setShowConcierge] = useState(false);
+  const [conciergeOverrides, setConciergeOverrides] = useState({});
+  const [userViewMode, setUserViewMode] = useState(false);
+  const [clientPortalProjectId, setClientPortalProjectId] = useState('1');
+  const [autonomousBlogPosts, setAutonomousBlogPosts] = useState(() => {
+    try {
+      const raw = localStorage.getItem('dominat8_autonomous_blog');
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
+  const [draftLeads, setDraftLeads] = useState([]);
+  const [lastLoginAt, setLastLoginAt] = useState(() => {
+    try {
+      const t = parseInt(localStorage.getItem('dominat8_last_login') || '0', 10);
+      return t || Date.now();
+    } catch { return Date.now(); }
+  });
+  const [retentionHooks, setRetentionHooks] = useState([]);
+  const [featureFlagsByDeployment, setFeatureFlagsByDeployment] = useState(() => {
+    try {
+      const raw = localStorage.getItem('dominat8_feature_flags');
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
 
   // Rendering Stress Test: ?stress=N renders N 3D cards + FPS meter (max 100)
   const [stressCount] = useState(() => getStressCount());
@@ -2183,9 +2593,25 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     appendNightLog(`Vibe-to-Build: Downloaded vercel.json for vibe "${vibe}".`);
   }, [vercelJsonForVibe, vibe, appendNightLog]);
 
+  // Intelligence Suite: Predictive QA — system health before Vercel push; if complexity high, QA suggests refactor
+  const getBlueprintComplexity = useCallback(() => {
+    try {
+      return JSON.stringify(siteBlueprint).length;
+    } catch {
+      return 0;
+    }
+  }, []);
+  const COMPLEXITY_THRESHOLD = 400;
+
   // Aura-to-Vercel: try real deploy first, fallback to simulated build log
   const onDeployClick = async () => {
     if (isDeploying) return;
+    const complexity = getBlueprintComplexity();
+    if (complexity > COMPLEXITY_THRESHOLD) {
+      setActiveAgentLead(2);
+      setAgencyTeam((prev) => ({ ...prev, qa: 'working' }));
+      appendNightLog('QA: System Health — code complexity high before push. Suggesting clean-up refactor.');
+    }
     setIsDeploying(true);
     setDeploySimulate(false);
     setDeployLogText('Connecting to Vercel...');
@@ -2281,6 +2707,14 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       appendNightLog(`SSL Certificate fix applied to '${url}'.`);
     }, 600);
   };
+
+  // Viral Growth: Commander View — apply Self-Healing patch to all deployments at once
+  const runGlobalUpdate = useCallback(() => {
+    effectiveDeployments.forEach((d, i) => {
+      setTimeout(() => onFixDeployment(d.id), i * 350);
+    });
+    appendNightLog('Commander: Global Update — Self-Healing patch applied to all deployments.');
+  }, [effectiveDeployments, appendNightLog]);
 
   const deploymentsRef = useRef(deployments);
   deploymentsRef.current = deployments;
@@ -2495,6 +2929,69 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     } catch (_) {}
   }, []);
 
+  // Viral Growth: Lead Magnet — scan adds draft lead; Create invite flags Creative Director
+  const onLeadScan = useCallback(() => {
+    const s = SOCIAL_TREND_SOURCES[Math.floor(Math.random() * SOCIAL_TREND_SOURCES.length)];
+    setDraftLeads((prev) => [
+      ...prev,
+      {
+        id: String(Date.now()),
+        source: s.keyword,
+        handle: s.handle,
+        suggestedSite: `${s.handle.replace('@', '')}.dominat8.site`,
+        invited: false,
+      },
+    ]);
+    appendNightLog(`Lead Magnet: Draft build created for ${s.handle} (${s.keyword}).`);
+  }, [appendNightLog]);
+
+  const onCreateLeadInvite = useCallback(
+    (lead) => {
+      setDraftLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, invited: true } : l)));
+      setActiveAgentLead(0);
+      setAgencyTeam((prev) => ({ ...prev, creativeDirector: 'working' }));
+      appendNightLog(`Creative Director: Personalized invite created for ${lead.handle} — ${lead.suggestedSite}`);
+    },
+    [appendNightLog, setActiveAgentLead, setAgencyTeam]
+  );
+
+  // Elite Operations: Feature Control — toggle per deployment, persist to localStorage
+  const onToggleFeature = useCallback((deploymentId, feature, value) => {
+    setFeatureFlagsByDeployment((prev) => {
+      const next = { ...prev, [deploymentId]: { ...(prev[deploymentId] ?? { socialAgent: true, seoAutopilot: true }), [feature]: value } };
+      try { localStorage.setItem('dominat8_feature_flags', JSON.stringify(next)); } catch (_) {}
+      return next;
+    });
+  }, []);
+
+  const onGenerateSuccessStory = useCallback(
+    (story) => {
+      setAutonomousBlogPosts((prev) => [...prev, { id: String(Date.now()), ...story, date: new Date().toISOString().slice(0, 10), type: 'case-study' }]);
+      try {
+        const raw = localStorage.getItem('dominat8_autonomous_blog');
+        const list = raw ? JSON.parse(raw) : [];
+        list.push({ id: String(Date.now()), ...story, date: new Date().toISOString().slice(0, 10), type: 'case-study' });
+        localStorage.setItem('dominat8_autonomous_blog', JSON.stringify(list));
+      } catch (_) {}
+      appendNightLog('Ghost Copywriter: Success Story generated and added to Showroom.');
+    },
+    [appendNightLog, setAutonomousBlogPosts]
+  );
+
+  // Intelligence Suite: Concierge — Lead Dev applies user request to JSON (e.g. hero placeholder)
+  const handleConciergeRequest = useCallback(
+    (text) => {
+      if (!text || !text.trim()) return;
+      const t = text.trim();
+      const heroPlaceholder = t.includes(' to ') ? t.split(' to ').slice(1).join(' to ').trim() : t;
+      setConciergeOverrides((prev) => ({ ...prev, heroPlaceholder }));
+      setActiveAgentLead(1);
+      setAgencyTeam((prev) => ({ ...prev, leadDev: 'working' }));
+      appendNightLog(`Lead Dev: Concierge — applied to JSON: "${t.slice(0, 60)}${t.length > 60 ? '…' : ''}"`);
+    },
+    [appendNightLog, setActiveAgentLead, setAgencyTeam]
+  );
+
   const auraContext = {
     activeView,
     setActiveView,
@@ -2552,8 +3049,25 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     showUpgradeProModal,
     appendNightLog,
     setActiveAgentLead,
-    nightShiftLog,
     seoHealth,
+    conciergeOverrides,
+    showConcierge,
+    setShowConcierge,
+    handleConciergeRequest,
+    userViewMode,
+    setUserViewMode,
+    clientPortalProjectId,
+    setClientPortalProjectId,
+    autonomousBlogPosts,
+    setAutonomousBlogPosts,
+    draftLeads,
+    onLeadScan,
+    onCreateLeadInvite,
+    onGlobalUpdate: runGlobalUpdate,
+    retentionHooks,
+    featureFlagsByDeployment,
+    onToggleFeature,
+    onGenerateSuccessStory,
   };
 
   // Navigation: when activeView is not "deploy", show Hero + view panel + dock instead of full dashboard
@@ -2582,9 +3096,109 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
     '--agency-glass': agencyTweak.glass,
   };
 
+  // Intelligence Suite: Stealth Blog — Creative Director generates post from Self-Healing wins (every 24h or on first run)
+  const autonomousBlogLastGenRef = useRef(0);
+  useEffect(() => {
+    if (autonomousBlogPosts.length === 0) {
+      const first = {
+        id: '1',
+        title: 'How we achieved 99.9% uptime for horizonaid.tech',
+        body: 'Our Self-Healing agent detected a certificate issue and renewed it automatically. Zero manual intervention. The Lead Dev analyzed the logs and applied the fix before you woke up.',
+        date: new Date().toISOString().slice(0, 10),
+        type: 'self-healing',
+      };
+      autonomousBlogLastGenRef.current = Date.now();
+      setAutonomousBlogPosts([first]);
+      try {
+        localStorage.setItem('dominat8_autonomous_blog', JSON.stringify([first]));
+      } catch (_) {}
+    }
+  }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const healing = nightShiftLog.filter((e) => /Self-Heal|Lead Dev|repair|Certificate|SSL|analyzing|Vercel build/i.test(e.message));
+      if (healing.length > 0 && Date.now() - autonomousBlogLastGenRef.current > 23 * 60 * 60 * 1000) {
+        autonomousBlogLastGenRef.current = Date.now();
+        const msg = healing[healing.length - 1].message;
+        const title = `How we kept ${effectiveDeployments[0]?.url || 'your site'} live`;
+        const body = msg.length > 140 ? msg.slice(0, 140) + '…' : msg;
+        setAutonomousBlogPosts((prev) => {
+          const next = [...prev, { id: String(Date.now()), title, body, date: new Date().toISOString().slice(0, 10), type: 'self-healing' }];
+          try {
+            localStorage.setItem('dominat8_autonomous_blog', JSON.stringify(next));
+          } catch (_) {}
+          return next;
+        });
+      }
+    }, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [nightShiftLog, effectiveDeployments]);
+
+  // Viral Growth: Legacy Backup — Daily Blueprint Snapshot every 24h for instant recovery (revert Self-Healing, etc.)
+  const DOMINAT8_DAILY_SNAPSHOT_KEY = 'dominat8_daily_snapshot';
+  const snapshotStateRef = useRef({ deployments, themeConfig, nightShiftLog });
+  snapshotStateRef.current = { deployments, themeConfig, nightShiftLog };
+  useEffect(() => {
+    const saveSnapshot = () => {
+      try {
+        const { deployments: d, themeConfig: t, nightShiftLog: n } = snapshotStateRef.current;
+        const snapshot = {
+          blueprint: siteBlueprint,
+          deployments: d,
+          themeConfig: t,
+          nightShiftLog: n,
+          timestamp: new Date().toISOString(),
+        };
+        localStorage.setItem(DOMINAT8_DAILY_SNAPSHOT_KEY, JSON.stringify(snapshot));
+        appendNightLog('Legacy Backup: Daily Blueprint Snapshot saved. Revert anytime from storage.');
+      } catch (_) {}
+    };
+    saveSnapshot();
+    const interval = setInterval(saveSnapshot, 24 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Elite Operations: User Pulse / Retention — if lastLogin > 3 days, Creative Director drafts Value Update
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('dominat8_last_login');
+      const t = raw ? parseInt(raw, 10) : 0;
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+      if (t > 0 && Date.now() - t > threeDaysMs) {
+        setRetentionHooks((prev) => [...prev, { id: Date.now(), message: 'Value Update draft: We just updated your SEO keywords!', createdAt: Date.now() }]);
+        setActiveAgentLead(0);
+        setAgencyTeam((prev) => ({ ...prev, creativeDirector: 'working' }));
+        appendNightLog('Creative Director: Retention Hook — drafted Value Update email for inactive user.');
+      }
+      localStorage.setItem('dominat8_last_login', String(Date.now()));
+    } catch (_) {}
+  }, []);
+
+  // Elite Operations: Performance Scaler — Speed Insights; if latency > 200ms, Lead Dev suggests Edge Optimization
+  const EDGE_OPTIMIZATION_PATCH = `[Speed Insights] Latency: 220ms — above threshold.
+Lead Dev: Edge Optimization patch suggested.
+- Enable Vercel Image Optimization for /public assets.
+- Add cache-control: public, max-age=31536000 for static assets.
+- Edge caching: enable ISR for dynamic routes.`;
+  const speedInsightsCheckedRef = useRef(false);
+  useEffect(() => {
+    if (speedInsightsCheckedRef.current) return;
+    speedInsightsCheckedRef.current = true;
+    const latency = 150 + Math.random() * 120;
+    if (latency > 200) {
+      setActiveAgentLead(1);
+      setAgencyTeam((prev) => ({ ...prev, leadDev: 'working' }));
+      setAgentTypingText(EDGE_OPTIMIZATION_PATCH);
+      appendNightLog('Lead Dev: Speed Insights — latency > 200ms. Edge Optimization patch suggested in terminal.');
+    }
+  }, [setActiveAgentLead, setAgencyTeam, setAgentTypingText, appendNightLog]);
+
   if (showShowroom) {
     return (
-      <ShowroomView onLaunchLab={() => setEnteredLab(true)} />
+      <ShowroomView
+        onLaunchLab={() => setEnteredLab(true)}
+        autonomousBlogPosts={autonomousBlogPosts}
+      />
     );
   }
 
@@ -2650,8 +3264,8 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         )}
       </AnimatePresence>
 
-      {/* Toolbar: Bring Forward, Vercel Status, … (hidden in Focus Mode) */}
-      {!cinematicFocus && (
+      {/* Toolbar: Bring Forward, Vercel Status, … (hidden in Focus Mode and User View) */}
+      {!cinematicFocus && !userViewMode && (
       <div className="builder-toolbar flex items-center gap-2">
         {/* Energy Orbs: Creative (Pink), Dev (Cyan), QA (Amber) — pulse speed reflects active agent */}
         <div className="nexus-energy-orbs flex items-center gap-2 px-2 border-r border-white/15 mr-1" aria-label="Agent status">
@@ -2697,7 +3311,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
               ? 'vercel-status-active'
               : 'vercel-status-active'
           )}
-          title={vercelSyncLoading ? 'Syncing…' : `Vercel status: ${deploymentStatus === 'ok' ? 'healthy' : deploymentStatus === 'error' ? 'error' : 'unknown'}. Click to sync.`}
+          title={vercelSyncLoading ? 'Syncing…' : `Vercel status (Pro): ${deploymentStatus === 'ok' ? 'healthy' : deploymentStatus === 'error' ? 'error' : 'unknown'}. Click to sync.`}
           aria-label={vercelSyncLoading ? 'Syncing Vercel status' : `Vercel status: ${deploymentStatus === 'ok' ? 'healthy' : deploymentStatus === 'error' ? 'error' : 'unknown'}`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -2705,6 +3319,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         >
           <span className="vercel-status-dot" aria-hidden />
           {vercelSyncLoading ? 'Syncing…' : 'Vercel Status'}
+          {!isPro && <Crown className="w-3.5 h-3.5 text-amber-400/90 ml-0.5" />}
         </motion.button>
         <motion.button
           type="button"
@@ -2849,6 +3464,21 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           <Sparkles className="w-4 h-4" />
           Social Lab
         </motion.button>
+        <motion.button
+          type="button"
+          onClick={() => {
+            setUserViewMode(true);
+            setShowAgencySidebar(false);
+          }}
+          className="builder-toggle flex items-center gap-1.5"
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+          title="Switch to Client Portal — Pulse only, no Admin tools"
+        >
+          <User className="w-4 h-4" />
+          User View
+        </motion.button>
         {/* DNS Status: green when dominat8.io / dominat8.com are valid (Content & Commerce Engine) */}
         <div
           className={cn(
@@ -2930,6 +3560,16 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
       {/* Empire: Upgrade to Pro CTA modal */}
       <UpgradeProModal isOpen={showUpgradeProModal} onClose={() => setShowUpgradeProModal(false)} />
 
+      {/* Intelligence Suite: Concierge Support — 24/7 widget; Lead Dev applies to JSON */}
+      {!userViewMode && (
+        <ConciergeSupportWidget
+          isOpen={showConcierge}
+          onOpen={() => setShowConcierge(true)}
+          onClose={() => setShowConcierge(false)}
+          onSubmit={handleConciergeRequest}
+        />
+      )}
+
       {/* Agency Intelligence sidebar */}
       <AgencyIntelligenceSidebar
         nightShiftLog={nightShiftLog}
@@ -2940,6 +3580,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         seoHealth={seoHealth}
         isPro={isPro}
         onUpgradePro={() => setShowUpgradeProModal(true)}
+        onGlobalUpdate={runGlobalUpdate}
       />
 
       {/* Self-Healing Ticket panel */}
@@ -2979,8 +3620,8 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         )}
       </AnimatePresence>
 
-      {/* AI Activity Feed – hidden in Focus Mode */}
-      {!cinematicFocus && nightShiftLog.length > 0 && (
+      {/* AI Activity Feed – hidden in Focus Mode and User View */}
+      {!cinematicFocus && !userViewMode && nightShiftLog.length > 0 && (
         <motion.div
           className="night-shift-feed"
           initial={{ opacity: 0, y: 8 }}
@@ -2999,6 +3640,45 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
         </motion.div>
       )}
 
+      {userViewMode ? (
+        <motion.div
+          className="main-content-wrap flex flex-col items-center pt-20 pb-32 px-4 relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
+          {/* Elite Operations: Tenant Shield — Matrix-style scanlines when Client View active */}
+          <div className="tenant-shield-scanlines fixed inset-0 z-[5] pointer-events-none" aria-hidden />
+          <div className="w-full max-w-xl rounded-2xl p-8 deployment-card-glass border border-white/10 relative z-10">
+            <h2 className="text-xl font-semibold text-white/95 mb-4 flex items-center gap-2">
+              <Shield className="w-6 h-6 text-emerald-400/80" />
+              Client Portal
+            </h2>
+            <p className="text-white/50 text-sm mb-4">Pulse Analytics for your project. No Admin tools — what your clients see.</p>
+            <label className="text-white/50 text-xs uppercase tracking-wider mb-2 block">Project</label>
+            <select
+              value={clientPortalProjectId}
+              onChange={(e) => setClientPortalProjectId(e.target.value)}
+              className="mb-4 w-full rounded-xl bg-white/5 border border-white/10 text-white/90 py-2 px-3 text-sm"
+            >
+              {(() => {
+                const sanitized = effectiveDeployments.map((d) => ({ id: d.id, url: d.url, status: d.status }));
+                return sanitized.map((d) => (
+                  <option key={d.id} value={d.id}>{d.url}</option>
+                ));
+              })()}
+            </select>
+            <GrowthHeartbeat nightShiftLog={nightShiftLog} seoHealth={seoHealth} />
+            <button
+              type="button"
+              onClick={() => setUserViewMode(false)}
+              className="mt-6 w-full py-3 rounded-xl font-medium bg-white/10 border border-white/20 text-white/90 hover:bg-white/15"
+            >
+              Exit User View
+            </button>
+          </div>
+        </motion.div>
+      ) : (
       <motion.div
         className={cn('main-content-wrap', cinematicFocus && 'main-content-cinematic')}
         animate={{
@@ -3041,6 +3721,7 @@ ${urls.map((u) => `  <url><loc>${u.loc}</loc><changefreq>${u.changefreq}</change
           )}
         </AnimatePresence>
       </motion.div>
+      )}
 
       <AnimatePresence mode="wait">
         {fullScreenDeployment && (
