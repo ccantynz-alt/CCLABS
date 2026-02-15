@@ -2440,32 +2440,32 @@ function App() {
     try {
       const res = await fetch('/api/vercel-status', { method: 'GET' });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && Array.isArray(data.deployments)) {
+      if (res.ok && Array.isArray(data.deployments) && data.deployments.length > 0) {
+        // Use live deployments from Vercel API — show actual URLs and status
         let hasError = false;
-        let errorVercelId = null;
-        setDeployments((prev) =>
-          prev.map((d) => {
-            const remote = data.deployments.find((r) => r.id === d.id || r.url === d.url || (r.url && d.url && (r.url === d.url || r.url.includes(d.url))));
-            if (!remote) return d;
-            const status = remote.state === 'READY' ? 'ok' : remote.state === 'ERROR' ? 'Error' : d.status;
-            if (status === 'Error') {
-              hasError = true;
-              errorVercelId = remote.id;
-            }
-            return {
-              ...d,
-              status,
-              vercelId: remote.id,
-            };
-          })
-        );
-        setDeploymentStatus(hasError ? 'error' : data.deployments.length ? 'ok' : 'unknown');
-        appendNightLog('Vercel Sync: Fetched live build status from API.');
+        const liveDeployments = data.deployments.map((r, i) => {
+          const status = r.state === 'READY' ? 'ok' : r.state === 'ERROR' ? 'Error' : r.state === 'BUILDING' ? 'New' : 'ok';
+          if (status === 'Error') hasError = true;
+          const displayUrl = (r.url || '').replace(/^https?:\/\//, '').replace(/\/$/, '') || `deployment-${i + 1}`;
+          return {
+            id: r.id,
+            url: displayUrl,
+            status,
+            progress: status === 'ok' ? 85 + Math.floor(Math.random() * 15) : status === 'Error' ? 45 : 70,
+            color: status === 'ok' ? 'green' : status === 'Error' ? 'red' : 'blue',
+            speed: status === 'ok' ? 90 + Math.floor(Math.random() * 10) : 75,
+            vercelId: r.id,
+          };
+        });
+        setDeployments(liveDeployments);
+        setDeploymentStatus(hasError ? 'error' : 'ok');
+        appendNightLog(`Vercel Sync: ${liveDeployments.length} live deployment(s) loaded.`);
       } else {
+        // Fallback: API not configured or empty — keep projectData
         await new Promise((r) => setTimeout(r, 1200));
-        setDeployments((prev) => prev.map((d, i) => ({ ...d, status: i === 0 ? 'ok' : d.status })));
+        setDeployments((prev) => (prev.length ? prev : [...projectData]).map((d, i) => ({ ...d, status: i === 0 ? 'ok' : d.status })));
         setDeploymentStatus('unknown');
-        appendNightLog('Vercel Sync: Simulated status check (API not configured).');
+        appendNightLog('Vercel Sync: Simulated status check (API not configured or no deployments).');
       }
     } catch (_) {
       await new Promise((r) => setTimeout(r, 800));

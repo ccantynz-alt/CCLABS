@@ -3,6 +3,6 @@
   "private": true,
   "description": "Repo root for Vercel; app lives in ai-command-center",
   "scripts": {
-    "vercel-build": "cd ai-command-center && npm ci && npm run build && cp -r build .."
+    "vercel-build": "cd ai-command-center && npm ci && npm run build && cp -r build .. && cp -r api .."
   }
 }
