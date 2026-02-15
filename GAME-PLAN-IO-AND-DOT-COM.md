@@ -18,6 +18,21 @@
 
 ---
 
+## Scheduled Builds (Next ~3.5 Hours)
+
+A workflow **`scheduled-build-deploy.yml`** runs every 15 minutes:
+
+- **Build** — Same as Build Health (vercel-build)
+- **Deploy** — Pushes to Vercel if `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` are set in repo secrets
+
+**To activate the schedule:** Merge this branch to `main`. Scheduled workflows only run from the default branch.
+
+**Manual trigger:** Go to **Actions** → **Scheduled Build & Deploy** → **Run workflow** (works from any branch).
+
+**To stop after ~3.5 hours:** Edit the workflow and remove the `schedule:` block, or delete the file.
+
+---
+
 ## Phase 1: Deployment & Domain Setup (Vercel)
 
 ### 1.1 Add Both Domains to Vercel
