@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown, Megaphone, MessageCircle, User, BookOpen, Target, Zap, Shield, Sliders, ChevronDown } from 'lucide-react';
+import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown, Megaphone, MessageCircle, User, BookOpen, Target, Zap, Shield, Sliders, ChevronDown, PenLine } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
 
@@ -61,9 +61,9 @@ function FPSMeter() {
 // GLOBAL STATE CONTROLLER – single source of truth (Aura Decathlon: no new files)
 // ═══════════════════════════════════════════════════════════════════════════════
 const projectData = [
-  { id: '1', url: 'www.horizonaid.tech', progress: 72, color: 'green', status: 'ok', speed: 94 },
-  { id: '2', url: 'akiraspacepro.io', progress: 45, color: 'orange', status: 'New', speed: 88 },
-  { id: '3', url: 'bloometapro.com', progress: 88, color: 'blue', status: 'ok', speed: 97 },
+  { id: '1', url: 'www.horizonaid.tech', label: 'Bot AI deployments', progress: 72, color: 'green', status: 'ok', speed: 94, statusText: 'Uptime 99.98%' },
+  { id: '2', url: 'akiraspacepro.io', label: 'Web platform deploy', progress: 70, color: 'orange', status: 'New', speed: 88, statusText: 'Deploying 70%' },
+  { id: '3', url: 'bloometapro.com', label: 'Bots upgrade deployment', progress: 54, color: 'blue', status: 'ok', speed: 97, statusText: 'Optimizing new bots 54%' },
 ];
 
 // useAura: Theme, Active Deployment, Healing + Universal State Lock (no two agents fight over same code)
@@ -187,19 +187,14 @@ const PRIME_BLUEPRINTS = [
 ];
 
 const DOCK_ITEMS = [
-  { id: 'deploy', label: 'Deploy', Icon: Rocket, color: '#22c55e' },
-  { id: 'leads', label: 'Lead Magnet', Icon: Target, color: '#a855f7' },
-  { id: 'revenue', label: 'Revenue', Icon: DollarSign, color: '#10b981' },
-  { id: 'marketing', label: 'Marketing', Icon: Megaphone, color: '#f59e0b' },
-  { id: 'domains', label: 'Domains', Icon: Globe, color: '#3b82f6' },
-  { id: 'ssl', label: 'SSL', Icon: Lock, color: '#eab308' },
-  { id: 'monitor', label: 'Monitor', Icon: Monitor, color: '#a855f7' },
+  { id: 'deploy', label: 'Deploy', Icon: Rocket, color: '#3b82f6' },
+  { id: 'domains', label: 'Domains', Icon: Globe, color: '#8b5a2b' },
+  { id: 'ssl', label: 'SSL', Icon: Lock, color: '#a855f7' },
+  { id: 'monitor', label: 'Monitor', Icon: Monitor, color: '#3b82f6' },
   { id: 'fix', label: 'Fix', Icon: Wrench, color: '#f97316' },
-  { id: 'automate', label: 'Automate', Icon: Sparkles, color: '#ec4899' },
-  { id: 'settings', label: 'Settings', Icon: Settings, color: '#94a3b8' },
-  { id: 'case-studies', label: 'Case Studies', Icon: BookOpen, color: '#06b6d4' },
-  { id: 'feature-control', label: 'Feature Control', Icon: Sliders, color: '#64748b' },
-  { id: 'summary', label: 'Nightly Summary', Icon: FileText, color: '#8b5cf6' },
+  { id: 'automate', label: 'Automate', Icon: Sparkles, color: '#1e40af' },
+  { id: 'integrate', label: 'Integrate', Icon: PenLine, color: '#1e40af' },
+  { id: 'settings', label: 'Settings', Icon: Settings, color: '#64748b' },
 ];
 
 // Aura Agency Brain: 4 expert agents (status: idle | working)
@@ -736,6 +731,7 @@ function DeploymentCardBlock({ props: blockProps, context }) {
           </motion.button>
         </div>
       )}
+      <h2 className="text-white/80 font-semibold text-lg mb-2 w-full max-w-4xl text-left">Deployments</h2>
       <div className="w-full flex flex-wrap justify-center gap-6">
         {deployments.map((d) => {
           const isError = d.status === 'Error' || (selfHealingOn && d.id === errorDeploymentId);
@@ -817,6 +813,9 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                 />
               )}
+              {d.label && (
+                <p className="text-white/60 text-sm mb-1">{d.label}</p>
+              )}
               <div className="flex items-center justify-between gap-2 mb-2">
                 <span className="text-white/90 font-medium text-lg truncate" title={d.url}>
                   {d.url}
@@ -838,9 +837,18 @@ function DeploymentCard3D({ layoutId, isHealing, onClick, isError, d, taskColor,
               <ProgressBar progress={d.progress} color={d.color} taskColor={isHealing ? 'healing' : taskColor} />
               <div className="mt-2 flex items-center justify-between text-white/40 text-sm">
                 <span>{d.progress}% complete</span>
-                {d.speed != null && (
+                {d.statusText ? (
+                  <span className={cn(
+                    'deployment-status-pill text-xs font-medium px-2 py-0.5 rounded-full',
+                    d.status === 'ok' && 'text-emerald-400/90 bg-emerald-500/20',
+                    d.status === 'New' && 'text-amber-400/90 bg-amber-500/20',
+                    d.color === 'blue' && d.status === 'ok' && 'text-cyan-400/90 bg-cyan-500/20'
+                  )}>
+                    {d.statusText}
+                  </span>
+                ) : d.speed != null ? (
                   <span className="text-white/50 font-medium">Speed {Math.round(d.speed)}</span>
-                )}
+                ) : null}
               </div>
               {isError && !agentTypingText && (
                 <motion.div
@@ -1176,18 +1184,14 @@ function FeatureControlPanelBlock({ deployments = [], featureFlagsByDeployment =
 
 // View panel shown when a dock item other than Deploy is selected (navigation content)
 const VIEW_PANEL_CONFIG = {
-  leads: { label: 'Lead Magnet', description: 'Draft builds from social mentions — AI Website Builder, Lovable alternative.', Icon: Target },
-  revenue: { label: 'Revenue', description: 'Affiliate links and referral revenue from Built with Dominat8.', Icon: DollarSign },
-  marketing: { label: 'Marketing', description: 'Autonomous Ad Architect — Facebook & Google ad copy from Pulse.', Icon: Megaphone },
+  deploy: { label: 'Deploy', description: 'Deploy and manage your projects.', Icon: Rocket },
   domains: { label: 'Domains', description: 'Manage custom domains and DNS records.', Icon: Globe },
   ssl: { label: 'SSL', description: 'Certificates and HTTPS status for your deployments.', Icon: Lock },
   monitor: { label: 'Monitor', description: 'Uptime, logs, and performance metrics.', Icon: Monitor },
   fix: { label: 'Fix', description: 'Self-heal and repair deployment issues.', Icon: Wrench },
   automate: { label: 'Automate', description: 'Workflows and automation rules.', Icon: Sparkles },
+  integrate: { label: 'Integrate', description: 'Connect APIs, webhooks, and third-party services.', Icon: PenLine },
   settings: { label: 'Settings', description: 'Project and account preferences.', Icon: Settings },
-  'case-studies': { label: 'Case Studies', description: 'Ghost Copywriter — Success Stories from Uptime & Self-Heal logs.', Icon: BookOpen },
-  'feature-control': { label: 'Feature Control', description: 'Toggle Social Agent & SEO Autopilot per deployment.', Icon: Sliders },
-  summary: { label: 'Nightly Summary', description: 'Morning Report — value generated by the Agency overnight.', Icon: FileText },
 };
 
 function ViewPanelBlock({ props: blockProps, context }) {
@@ -1780,23 +1784,23 @@ function InteractiveDockBlock({ props: blockProps, context }) {
   if (cinematicFocus) return null;
   return (
     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20" aria-label="Main navigation">
-      <div className="dock flex items-center gap-1 px-4 py-3 rounded-2xl border border-white/10">
+      <div className="dock flex items-center gap-2 px-5 py-3 rounded-2xl border border-white/10">
         {dockItems.map((item) => (
           <motion.button
             key={item.id}
             type="button"
             className={cn(
-              'dock-icon-btn p-3 rounded-xl transition-all duration-200 hover:bg-white/10',
+              'dock-icon-btn flex flex-col items-center gap-1 p-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 min-w-[4rem]',
               activeView === item.id && 'bg-white/15'
             )}
             style={{
               color: item.color,
-              opacity: activeView === item.id ? 1 : 0.5,
+              opacity: activeView === item.id ? 1 : 0.7,
             }}
             title={item.label}
             aria-label={item.label}
             aria-pressed={activeView === item.id}
-            whileHover={{ scale: 1.08, y: -2 }}
+            whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             onClick={() => {
@@ -1804,7 +1808,8 @@ function InteractiveDockBlock({ props: blockProps, context }) {
               if (item.id === 'deploy') onFocusMode && onFocusMode();
             }}
           >
-            <item.Icon className="w-6 h-6" />
+            <item.Icon className="w-6 h-6 flex-shrink-0" />
+            <span className="dock-label text-[10px] font-medium uppercase tracking-wider opacity-90">{item.label}</span>
           </motion.button>
         ))}
       </div>
