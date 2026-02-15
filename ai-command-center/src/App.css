@@ -1182,6 +1182,26 @@
 .app-bg.vibe-cloud .focus-step-label.done { color: #16a34a; }
 .app-bg.vibe-cloud .focus-step-label.active { color: #2563eb; }
 
+/* Hero: target design — heading + GENERATE button */
+.hero-heading {
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.hero-generate-btn {
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.4);
+}
+.hero-generate-btn:hover {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+}
+.app-bg.vibe-cloud .hero-heading { color: #1d1d1f; }
+.app-bg.vibe-cloud .hero-generate-btn {
+  background: #2563eb !important;
+  color: white !important;
+}
+.app-bg.vibe-cloud .hero-generate-btn:hover {
+  background: #1d4ed8 !important;
+}
+
 /* Bento box stats */
 .bento-grid {
   display: grid;

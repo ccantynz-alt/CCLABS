@@ -105,7 +105,7 @@ const DOMINAT8_ENTERED_LAB_KEY = 'dominat8_entered_lab';
 
 // Live Blueprint Engine – change one word here, UI re-morphs instantly
 const siteBlueprint = [
-  { type: 'Hero', id: 'hero', props: { placeholder: 'What would you like to build?' } },
+  { type: 'Hero', id: 'hero', props: { heading: 'What would you like to build?', placeholder: 'Describe your project...' } },
   { type: 'BentoStats', id: 'bento', props: {} },
   { type: 'DeploymentCard', id: 'deployments', props: {} },
   { type: 'InteractiveDock', id: 'dock', props: {} },
@@ -458,9 +458,10 @@ function TeamStatusWidget({ agencyTeam = {}, activeAgentLead }) {
 }
 
 // ─── Block components (Live Blueprint drives these) ───
-// Aura AI Command Input: "Creative Director, go Darker" -> instant UI update (Production Engine)
+// Hero: "What would you like to build?" + GENERATE — target design alignment
 function HeroBlock({ props: blockProps = {}, context }) {
-  const placeholder = context?.conciergeOverrides?.heroPlaceholder ?? blockProps.placeholder ?? 'Talk to your Agency — e.g. Creative Director, go Darker';
+  const heading = context?.conciergeOverrides?.heroHeading ?? blockProps.heading ?? 'What would you like to build?';
+  const placeholder = context?.conciergeOverrides?.heroPlaceholder ?? blockProps.placeholder ?? 'Describe your project...';
   const onVibeFromImage = context?.onVibeFromImage;
   const onVoiceVibe = context?.onVoiceVibe;
   const onAuraCommand = context?.onAuraCommand;
@@ -520,9 +521,12 @@ function HeroBlock({ props: blockProps = {}, context }) {
 
   return (
     <div className="w-full max-w-2xl mb-8">
+      <h1 className="hero-heading text-2xl sm:text-3xl font-semibold text-white/95 mb-6 text-center">
+        {heading}
+      </h1>
       <motion.div
         className={cn(
-          'relative flex items-center rounded-2xl bg-white/5 border transition-all duration-200',
+          'hero-input-wrap relative flex items-center rounded-2xl bg-white/5 border transition-all duration-200',
           dragOver ? 'border-white/30 ring-2 ring-white/20' : 'border-white/10 focus-within:border-white/20 focus-within:ring-2 focus-within:ring-white/10',
           heroDeepGlass && 'hero-input-deep-glass'
         )}
@@ -534,7 +538,7 @@ function HeroBlock({ props: blockProps = {}, context }) {
         transition={{ type: 'spring', stiffness: 300, damping: 28 }}
       >
         <span className="pl-5 flex-shrink-0 text-white/60">
-          <Sparkles className="w-5 h-5" />
+          <Rocket className="w-5 h-5" />
         </span>
         <input
           type="text"
@@ -542,21 +546,21 @@ function HeroBlock({ props: blockProps = {}, context }) {
           onChange={(e) => setCommandInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && submitCommand()}
           placeholder={placeholder}
-          className="w-full py-4 pl-3 pr-24 bg-transparent text-white placeholder-white/40 outline-none text-base"
-          aria-label="Aura AI command"
+          className="w-full py-4 pl-3 pr-32 bg-transparent text-white placeholder-white/40 outline-none text-base"
+          aria-label="Describe your project"
           onPaste={onPaste}
         />
-        <div className="absolute right-2 flex items-center gap-1">
+        <div className="absolute right-2 flex items-center gap-2">
           {onAuraCommand && (
             <motion.button
               type="button"
               onClick={submitCommand}
-              className="px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white/90 text-sm font-medium hover:bg-white/15 transition-colors"
+              className="hero-generate-btn px-5 py-2.5 rounded-xl font-semibold text-sm text-white bg-blue-500 hover:bg-blue-600 border-0 transition-colors"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
-              Send
+              GENERATE
             </motion.button>
           )}
           {onVibeFromImage && (
@@ -597,12 +601,12 @@ function HeroBlock({ props: blockProps = {}, context }) {
         </div>
       </motion.div>
       {onAuraCommand && (
-        <p className="mt-2 text-white/40 text-xs">
+        <p className="mt-2 text-white/40 text-xs text-center">
           Try: &quot;Creative Director, go Darker&quot; · &quot;make the cards more neon&quot; · &quot;cloud&quot;
         </p>
       )}
       {(onVibeFromImage || onVoiceVibe) && !onAuraCommand && (
-        <p className="mt-2 text-white/40 text-xs">
+        <p className="mt-2 text-white/40 text-xs text-center">
           Drop or paste image, or use mic: say &quot;warmer&quot;, &quot;cooler&quot;, &quot;obsidian&quot;, &quot;cloud&quot;
         </p>
       )}
