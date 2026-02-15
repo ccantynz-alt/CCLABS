@@ -1,13 +1,13 @@
-/* Cinematic: mesh gradient background - shifts by system health */
+/* Cinematic: mesh gradient background — Obsidian palette (PALETTES.md) */
 .app-bg {
-  --mesh-primary: #0f0f1a;
-  --mesh-mid: #0a0a12;
+  --mesh-primary: #0d0d14;
+  --mesh-mid: #0a0a0f;
   --mesh-bottom: #050508;
-  --mesh-accent: 59, 130, 246;
+  --mesh-accent: 250, 250, 252;
   --mesh-accent-amt: 0.08;
   background:
     radial-gradient(ellipse 120% 80% at 20% 20%, rgba(var(--mesh-accent), var(--mesh-accent-amt)) 0%, transparent 50%),
-    radial-gradient(ellipse 100% 60% at 80% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 60% at 80% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
     linear-gradient(165deg, var(--mesh-primary) 0%, var(--mesh-mid) 40%, var(--mesh-bottom) 100%);
   min-height: 100vh;
   height: 100vh;
@@ -22,7 +22,7 @@
   --mesh-accent-amt: 0.12;
 }
 .app-bg[data-health="ok"] {
-  --mesh-accent: 59, 130, 246;
+  --mesh-accent: 250, 250, 252;
   --mesh-accent-amt: 0.08;
 }
 
@@ -540,6 +540,38 @@
   border-color: rgba(59, 130, 246, 0.5);
   color: #93c5fd;
 }
+
+/* Toolbar More dropdown — cleaner dominat8.io Engine */
+.toolbar-more-dropdown {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+.toolbar-more-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.toolbar-more-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+.toolbar-more-item.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+.app-bg.vibe-cloud .toolbar-more-item { color: rgba(0, 0, 0, 0.75); }
+.app-bg.vibe-cloud .toolbar-more-item:hover { background: rgba(0, 0, 0, 0.06); color: rgba(0, 0, 0, 0.95); }
+.app-bg.vibe-cloud .toolbar-more-item.active { background: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
 
 /* Dominat8 Multi-Experience: Showroom (.com) + Engine (.io) */
 .showroom-bg {

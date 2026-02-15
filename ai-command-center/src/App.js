@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown, Megaphone, MessageCircle, User, BookOpen, Target, Zap, Shield, Sliders } from 'lucide-react';
+import { Rocket, Globe, Lock, Monitor, Wrench, Sparkles, Settings, AlertCircle, CheckCircle, Loader2, X, Mic, Ticket, FileText, Maximize2, DollarSign, Store, TrendingUp, Languages, Crown, Megaphone, MessageCircle, User, BookOpen, Target, Zap, Shield, Sliders, ChevronDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import './App.css';
 
@@ -1817,19 +1817,20 @@ const COMPONENT_MAP = {
 };
 
 // ─── renderPage: JSON-to-UI (Live Blueprint Engine) ───
+// Tighter stagger for cohesive first paint — avoids "parts" loading feeling
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.04, delayChildren: 0.02 } },
 };
 const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
 function renderPage(blueprint, context) {
   return (
     <motion.div
-      className="aura-render flex flex-col items-center pt-10 pb-28 px-4 w-full"
+      className="aura-render flex flex-col items-center pt-12 pb-28 px-4 w-full gap-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -2128,6 +2129,7 @@ function App() {
   const [showSourceCode, setShowSourceCode] = useState(false);
   const [showTickets, setShowTickets] = useState(false);
   const [showAgencySidebar, setShowAgencySidebar] = useState(false);
+  const [showToolbarMore, setShowToolbarMore] = useState(false);
   const [cinematicFocus, setCinematicFocus] = useState(false);
   const [enteredLab, setEnteredLab] = useState(() => {
     try {
@@ -3381,104 +3383,44 @@ Lead Dev: Edge Optimization patch suggested.
         >
           {themeConfig.vibe === 'custom' ? 'Custom' : vibe === 'obsidian' ? 'Obsidian' : 'Cloud'}
         </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => {
-            setActiveAgentLead(0);
-            appendNightLog('Creative Director: Global Launch — suggested translated meta-tags and headers for EN, ES, FR, DE, PT, JA, ZH, KO, AR, HI. Ready for multi-language rollout.');
-          }}
-          className="builder-toggle flex items-center gap-1.5"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Trigger Creative Director to suggest translated meta-tags (10 languages)"
-        >
-          <Languages className="w-4 h-4" />
-          Global Launch
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => setShowBlueprintStore(true)}
-          className="builder-toggle flex items-center gap-1.5"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Blueprint Store — Prime templates"
-        >
-          <Store className="w-4 h-4" />
-          Blueprint Store
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => setShowSourceCode(!showSourceCode)}
-          className={cn('builder-toggle', showSourceCode && 'active')}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-        >
-          Developer View
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={downloadSitemap}
-          className="builder-toggle"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Generate and download sitemap.xml from blueprint"
-        >
-          Sitemap
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={downloadVercelJson}
-          className="builder-toggle"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Download vercel.json for current Vibe"
-        >
-          vercel.json
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => setShowTickets(!showTickets)}
-          className={cn('builder-toggle', showTickets && 'active')}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Support tickets → suggested CSS fix"
-        >
-          <Ticket className="w-4 h-4" />
-          Tickets
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => setShowAgencySidebar(true)}
-          className={cn('builder-toggle', showAgencySidebar && 'active')}
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Social Lab — TikTok & Facebook scripts from aura_night_shift"
-        >
-          <Sparkles className="w-4 h-4" />
-          Social Lab
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => {
-            setUserViewMode(true);
-            setShowAgencySidebar(false);
-          }}
-          className="builder-toggle flex items-center gap-1.5"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          title="Switch to Client Portal — Pulse only, no Admin tools"
-        >
-          <User className="w-4 h-4" />
-          User View
-        </motion.button>
+        {/* More dropdown: secondary actions — cleaner toolbar for dominat8.io focus */}
+        <div className="relative">
+          <motion.button
+            type="button"
+            onClick={() => setShowToolbarMore(!showToolbarMore)}
+            className={cn('builder-toggle flex items-center gap-1.5', showToolbarMore && 'active')}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            title="More actions"
+          >
+            More
+            <ChevronDown className={cn('w-4 h-4 transition-transform', showToolbarMore && 'rotate-180')} />
+          </motion.button>
+          <AnimatePresence>
+            {showToolbarMore && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowToolbarMore(false)} aria-hidden />
+                <motion.div
+                  className="toolbar-more-dropdown absolute top-full right-0 mt-1 z-50 min-w-[180px] py-1 rounded-xl deployment-card-glass border border-white/20 shadow-2xl"
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <button type="button" onClick={() => { setShowBlueprintStore(true); setShowToolbarMore(false); }} className="toolbar-more-item"><Store className="w-4 h-4" /> Blueprint Store</button>
+                  <button type="button" onClick={() => { setShowSourceCode(!showSourceCode); setShowToolbarMore(false); }} className={cn('toolbar-more-item', showSourceCode && 'active')}><FileText className="w-4 h-4" /> Developer View</button>
+                  <button type="button" onClick={() => { downloadSitemap(); setShowToolbarMore(false); }} className="toolbar-more-item">Sitemap</button>
+                  <button type="button" onClick={() => { downloadVercelJson(); setShowToolbarMore(false); }} className="toolbar-more-item">vercel.json</button>
+                  <button type="button" onClick={() => { setShowTickets(!showTickets); setShowToolbarMore(false); }} className={cn('toolbar-more-item', showTickets && 'active')}><Ticket className="w-4 h-4" /> Tickets</button>
+                  <button type="button" onClick={() => { setShowAgencySidebar(true); setShowToolbarMore(false); }} className={cn('toolbar-more-item', showAgencySidebar && 'active')}><Sparkles className="w-4 h-4" /> Social Lab</button>
+                  <button type="button" onClick={() => { setActiveAgentLead(0); appendNightLog('Creative Director: Global Launch — suggested translated meta-tags and headers for EN, ES, FR, DE, PT, JA, ZH, KO, AR, HI. Ready for multi-language rollout.'); setShowToolbarMore(false); }} className="toolbar-more-item"><Languages className="w-4 h-4" /> Global Launch</button>
+                  <button type="button" onClick={() => { setUserViewMode(true); setShowAgencySidebar(false); setShowToolbarMore(false); }} className="toolbar-more-item"><User className="w-4 h-4" /> User View</button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
         {/* DNS Status: green when dominat8.io / dominat8.com are valid (Content & Commerce Engine) */}
         <div
           className={cn(
